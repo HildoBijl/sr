@@ -1,0 +1,33 @@
+@import 'params.less';
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+	height: 100%;
+}
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  line-height: @lineHeight;
+  
+  font-size: @phoneFontSize;
+  @media @desktop {
+    font-size: @desktopFontSize;
+  }
+}
+
+a {
+  text-decoration: none;
+  &:hover, &:active {
+    text-decoration: underline;
+  }
+  &, &:active, &:focus { // To prevent a dotted border from appearing after clicking on the link.
+    outline: none;
+  }
+}
+
+strong {
+  font-weight: bold;
+}

@@ -1,0 +1,49 @@
+// This file defines parameters used by multiple other style sheets.
+
+// Device media queries.
+@phonePortrait: ~"(max-width: 480px)";
+@phoneLandscape: ~"(min-width: 480.01px) and (max-width: 960px)";
+@phone: ~"(max-width: 960px)";
+@desktop: ~"(min-width: 960.01px)";
+@landscape: ~"(min-width: 480.01px)";
+
+// TODO: SORT OUT STUFF BELOW.
+
+// Page size settings.
+@maxWidth: 1200px;
+
+// Text size settings.
+@phoneFontSize: 13px;
+@desktopFontSize: 16px;
+@lineHeight: 10/7;
+
+// Colors.
+@lightThemeColor: #13a;
+@darkThemeColor: #9ae;
+@lightErrorColor: #922;
+@darkErrorColor: #a33;
+@lightSuccessColor: #262;
+@darkSuccessColor: #484;
+
+@lightFigureGuideColor: #d81;
+@darkFigureGuideColor: #d81;
+
+// Transition settings.
+@slowTime: 400ms;
+
+// Padding settings.
+.pagePadding {
+	padding: 15px 8px;
+	@media @phoneLandscape {
+		padding: 20px 16px;
+	}
+	@media @desktop {
+		padding: 28px 24px;
+	}
+}
+
+// Useful macros.
+.notSelectable {
+	user-select: none;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+}

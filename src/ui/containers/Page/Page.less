@@ -1,0 +1,111 @@
+@import '../../shared/params.less';
+
+.page {
+	align-self: stretch;
+	display: flex;
+	flex-flow: column nowrap;
+	flex-grow: 1;
+
+	.pageFader {
+		display: flex;
+		flex-flow: column nowrap;
+		flex-grow: 1;
+		position: relative; // To ensure proper (absolute) positioning on page fading.
+		width: 100%;
+
+		& > div {
+			.pagePadding;
+			margin: 0 auto;
+			max-width: @maxWidth;
+			width: 100%;
+
+			&.pageFade-appear {
+				opacity: 0.01;
+				&.pageFade-appear-active {
+					opacity: 1;
+					transition: opacity 0.2s;
+				}
+			}
+
+			&.pageFade-enter {
+				opacity: 0.01;
+				&.pageFade-enter-active {
+					opacity: 1;
+					transition: opacity 0.2s;
+				}
+			}
+
+			&.pageFade-leave {
+				left: 50%;
+				opacity: 1;
+				position: absolute;
+				top: 0;
+				transform: translateX(-50%);
+				width: 100%;
+				z-index: 1;
+				&.pageFade-leave-active {
+					opacity: 0.01;
+					transition: opacity 0.2s;
+				}
+			}
+		}
+
+		h1 {
+			font-weight: bold;
+			margin: 32px 0 24px 0;
+			
+			font-size: 1.9em;
+			@media @landscape {
+				font-size: 1.9em;
+			}
+		}
+
+		h2 {
+			font-weight: bold;
+			margin: 24px 0 16px 0;
+			
+			font-size: 1.7em;
+			@media @landscape {
+				font-size: 1.7em;
+			}
+		}
+
+		h3 {
+			font-weight: bold;
+			margin: 16px 0 10px 0;
+			
+			font-size: 1.4em;
+			@media @landscape {
+				font-size: 1.4em;
+			}
+		}
+
+		p {
+			line-height: @lineHeight;
+			margin: 6px 0 10px;
+		}
+
+		h1, h2, h3, p {
+			&:first-child {
+				margin-top: 0;
+			}
+		}
+	}
+}
+
+.lightTheme {
+	.success {
+		color: @lightSuccessColor;
+	}
+	.error {
+		color: @lightErrorColor;
+	}
+}
+.darkTheme {
+	.success {
+		color: @darkSuccessColor;
+	}
+	.error {
+		color: @darkErrorColor;
+	}
+}

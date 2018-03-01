@@ -1,0 +1,25 @@
+@import '../../shared/params.less';
+
+.app {
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	min-height: 100%;
+	overflow: hidden; // To prevent scrollbars on pages with absolutely positioned elements.
+	
+	transition: background-color @slowTime, color @slowTime;
+	&.lightTheme {
+		background: #eee;
+		color: #111;
+		a {
+			color: @lightThemeColor;
+		}
+	}
+	&.darkTheme {
+		background: #222;
+		color: #eee;
+		a {
+			color: @darkThemeColor;
+		}
+	}
+}
