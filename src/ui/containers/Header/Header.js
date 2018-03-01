@@ -8,7 +8,10 @@ import { Helmet } from 'react-helmet'
 import pages, { getTitle } from '../../pages'
 import logo from '../../../logo.svg'
 import MenuItem from '../../components/MenuItem/MenuItem.js'
-import Tree from '../../icons/Tree.js'
+import User from '../../icons/User.js'
+import Key from '../../icons/Key.js'
+import Map from '../../icons/Map.js'
+import News from '../../icons/News.js'
 import Cog from '../../icons/Cog.js'
 import Info from '../../icons/Info.js'
 
@@ -27,9 +30,11 @@ const Header = (props) => {
 					</Helmet>
 				</div>
 				<nav className="menu">
-					<MenuItem link="TREE" icon={Tree} label="ToDo" />
-					<MenuItem link="SETTINGS" icon={Cog} label="Instellingen" />
+					<MenuItem link="STORIES" icon={News} label="Ervaringen" />
 					<MenuItem link="ABOUT" icon={Info} label="Info" />
+					<MenuItem link="MAP" icon={Map} label="Kaart" />
+					{false /* TODO: check if logged in */ ? <MenuItem link="SETTINGS" icon={Cog} label="Instellingen" /> : <MenuItem link="LOGIN" icon={User} label="Log in" />}
+					{false /* TODO: check if admin */ ? '' : ''}
 				</nav>
 			</div>
 		</header>

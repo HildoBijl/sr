@@ -1,6 +1,10 @@
 import Home from './Home/Home.js'
-import Settings from './Settings/Settings.js'
+import Stories from './Stories/Stories.js'
+import Map from './Map/Map.js'
 import About from './About/About.js'
+import LogIn from './LogIn/LogIn.js'
+import Settings from './Settings/Settings.js'
+import Admin from './Admin/Admin.js'
 import NotFound from './NotFound/NotFound.js'
 
 const pages = {
@@ -10,15 +14,35 @@ const pages = {
 		skipPrefix: true, // Do not use a prefix in the <title>.
 		path: '/',
 	},
-	SETTINGS: {
-		component: Settings,
-		title: 'Instellingen',
-		path: '/instellingen',
+	STORIES: {
+		component: Stories,
+		title: 'Ervaringen',
+		path: '/ervaringen',
+	},
+	MAP: {
+		component: Map,
+		title: 'Kaart',
+		path: '/kaart',
 	},
 	ABOUT: {
 		component: About,
 		title: 'Info',
 		path: '/info',
+	},
+	LOGIN: {
+		component: LogIn,
+		title: 'Log in',
+		path: '/login',
+	},
+	SETTINGS: {
+		component: Settings,
+		title: 'Instellingen',
+		path: '/instellingen',
+	},
+	ADMIN: {
+		component: Admin,
+		title: 'Beheer',
+		path: '/beheer',
 	},
 	NOTFOUND: {
 		component: NotFound,
