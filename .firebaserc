@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "stille-rapers",
+    "test": "stille-rapers"
+  }
+}
