@@ -9,8 +9,6 @@ import classnames from 'classnames'
 import Header from '../Header/Header.js'
 import Page from '../Page/Page.js'
 
-import settingsActions from '../../../redux/settings.js'
-
 class App extends Component {
   render() {
     return (

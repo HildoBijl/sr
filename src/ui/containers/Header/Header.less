@@ -1,7 +1,9 @@
 @import '../../shared/params.less';
 
 .header {
+	background: @mainColor;
 	box-shadow: 0 4px 8px rgba(0,0,0,.26);
+	color: @headerTextColor;
 	width: 100%;
 	z-index: 10;
 
@@ -36,16 +38,21 @@
 				.notSelectable;
 
 				.logo {
+					color: @headerTextColor;
 					height: 46px;
-					margin-right: 8px;
+					margin-right: 12px;
 					width: 46px;
 					@media @phoneLandscape {
-						margin-right: 12px;
+						margin-right: 16px;
 					}
 					@media @desktop {
 						height: 70px;
-						margin-right: 20px;
+						margin-right: 24px;
 						width: 70px;
+					}
+
+					svg {
+						overflow: visible;
 					}
 				}
 			}
@@ -73,16 +80,4 @@
 			height: 100%;
 		}
 	}
-}
-
-.header {
-	transition: background-color @slowTime, color @slowTime;
-}
-.lightTheme .header {
-	background-color: #222;
-	color: #fff;
-}
-.darkTheme .header {
-	background-color: #000;
-	color: #fff;
 }

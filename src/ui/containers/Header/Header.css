@@ -16,7 +16,9 @@
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 .header {
+  background: #0091d2;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.26);
+  color: #eee;
   width: 100%;
   z-index: 10;
   height: 50px;
@@ -56,21 +58,25 @@
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 .header .contents .title .logoLink .logo {
+  color: #eee;
   height: 46px;
-  margin-right: 8px;
+  margin-right: 12px;
   width: 46px;
 }
 @media (min-width: 480.01px) and (max-width: 960px) {
   .header .contents .title .logoLink .logo {
-    margin-right: 12px;
+    margin-right: 16px;
   }
 }
 @media (min-width: 960.01px) {
   .header .contents .title .logoLink .logo {
     height: 70px;
-    margin-right: 20px;
+    margin-right: 24px;
     width: 70px;
   }
+}
+.header .contents .title .logoLink .logo svg {
+  overflow: visible;
 }
 .header .contents .title h1 {
   font-weight: normal;
@@ -94,15 +100,4 @@
   display: flex;
   flex-flow: row nowrap;
   height: 100%;
-}
-.header {
-  transition: background-color 400ms, color 400ms;
-}
-.lightTheme .header {
-  background-color: #222;
-  color: #fff;
-}
-.darkTheme .header {
-  background-color: #000;
-  color: #fff;
 }

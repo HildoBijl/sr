@@ -2,8 +2,6 @@
   "database": {
     "rules": "database.rules.json"
   },
-  "functions": {
-  },
   "hosting": {
     "public": "build",
     "ignore": [

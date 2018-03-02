@@ -6,8 +6,8 @@ import { connect } from 'react-redux'
 import { Helmet } from 'react-helmet'
 
 import pages, { getTitle } from '../../pages'
-import logo from '../../../logo.svg'
 import MenuItem from '../../components/MenuItem/MenuItem.js'
+import Logo from '../../icons/Logo.js'
 import User from '../../icons/User.js'
 import Key from '../../icons/Key.js'
 import Map from '../../icons/Map.js'
@@ -22,7 +22,7 @@ const Header = (props) => {
 			<div className="contents">
 				<div className="title">
 					<Link to={{ type: 'HOME' }} className="logoLink">
-						<img src={logo} alt="logo" className="logo" />
+						<Logo className="logo"/>
 					</Link>
 					<h1>{getTitle(page, props.payload)}</h1>
 					<Helmet>
@@ -34,7 +34,7 @@ const Header = (props) => {
 					<MenuItem link="ABOUT" icon={Info} label="Info" />
 					<MenuItem link="MAP" icon={Map} label="Kaart" />
 					{false /* TODO: check if logged in */ ? <MenuItem link="SETTINGS" icon={Cog} label="Instellingen" /> : <MenuItem link="LOGIN" icon={User} label="Log in" />}
-					{false /* TODO: check if admin */ ? '' : ''}
+					{false /* TODO: check if admin */ ? <MenuItem link="ADMIN" icon={Key} label="Beheer" /> : ''}
 				</nav>
 			</div>
 		</header>
