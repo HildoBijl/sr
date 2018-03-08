@@ -12,7 +12,7 @@ const pages = {
 		component: Home,
 		title: 'Stille Rapers',
 		skipPrefix: true, // Do not use a prefix in the <title>.
-		path: '/',
+		path: '/(index.html)?', // Make both the base path '/' and '/index.html' point to the Home page. The latter is called when a PWA starts up on a smartphone as local app.
 	},
 	STORIES: {
 		component: Stories,
