@@ -1,0 +1,89 @@
+@import '../../shared/params.less';
+
+.account {
+	.notification {
+		font-weight: bold;
+		line-height: 1.3em;
+		margin-bottom: 12px;
+		max-height: 3em;
+		overflow: hidden;
+		text-align: center;
+		transition: 400ms;
+		
+		&.hidden {
+			max-height: 0em;
+			margin-bottom: 0;
+			transition: 1600ms;
+		}
+	}
+
+	.notOnline {
+		font-weight: bold;
+		text-align: center;
+	}
+
+	.loadingIndicator {
+		align-items: center;
+		display: flex;
+		flex-flow: column nowrap;
+		justify-content: flex-start;
+
+		.loadingMessage {
+			margin-top: 12px;
+		}
+	}
+	
+	.signInButtons {
+		align-items: center;
+		display: flex;
+		flex-flow: row nowrap;
+		margin: 16px auto;
+		max-width: 600px;
+
+		.btn {
+			flex-grow: 1;
+			margin: 0 8px;
+		}
+	}
+	
+	.signInReasons {
+		margin: 10px 0;
+	}
+
+	ul {
+		list-style: square;
+		li {
+			margin: 0 0 6px 20px;
+		}
+	}
+
+	.signedInNote {
+		align-items: center;
+		display: flex;
+		flex-flow: row nowrap;
+		justify-content: space-between;
+		margin-bottom: 16px;
+
+		.signedInID {
+			margin-right: 8px;
+		}
+
+		.btn {
+			min-width: 74px;
+		}
+	}
+	
+	// Phones use redirect logins, while desktops use popup logins.
+	.redirectLogin {
+		display: block;
+		@media @desktop {
+			display: none;
+		}
+	}
+	.popupLogin {
+		display: none;
+		@media @desktop {
+			display: block;
+		}
+	}
+}

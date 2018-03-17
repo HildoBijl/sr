@@ -1,0 +1,93 @@
+.pagePadding {
+  padding: 15px 8px;
+}
+@media (min-width: 480.01px) and (max-width: 960px) {
+  .pagePadding {
+    padding: 20px 16px;
+  }
+}
+@media (min-width: 960.01px) {
+  .pagePadding {
+    padding: 28px 24px;
+  }
+}
+.notSelectable {
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+.account .notification {
+  font-weight: bold;
+  line-height: 1.3em;
+  margin-bottom: 12px;
+  max-height: 3em;
+  overflow: hidden;
+  text-align: center;
+  transition: 400ms;
+}
+.account .notification.hidden {
+  max-height: 0em;
+  margin-bottom: 0;
+  transition: 1600ms;
+}
+.account .notOnline {
+  font-weight: bold;
+  text-align: center;
+}
+.account .loadingIndicator {
+  align-items: center;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+}
+.account .loadingIndicator .loadingMessage {
+  margin-top: 12px;
+}
+.account .signInButtons {
+  align-items: center;
+  display: flex;
+  flex-flow: row nowrap;
+  margin: 16px auto;
+  max-width: 600px;
+}
+.account .signInButtons .btn {
+  flex-grow: 1;
+  margin: 0 8px;
+}
+.account .signInReasons {
+  margin: 10px 0;
+}
+.account ul {
+  list-style: square;
+}
+.account ul li {
+  margin: 0 0 6px 20px;
+}
+.account .signedInNote {
+  align-items: center;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.account .signedInNote .signedInID {
+  margin-right: 8px;
+}
+.account .signedInNote .btn {
+  min-width: 74px;
+}
+.account .redirectLogin {
+  display: block;
+}
+@media (min-width: 960.01px) {
+  .account .redirectLogin {
+    display: none;
+  }
+}
+.account .popupLogin {
+  display: none;
+}
+@media (min-width: 960.01px) {
+  .account .popupLogin {
+    display: block;
+  }
+}

@@ -45,6 +45,44 @@ a:active,
 a:focus {
   outline: none;
 }
+.btn {
+  background: #0091d2;
+  border-color: #0074a8;
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 0;
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  line-height: inherit;
+  padding: 6px 12px;
+  text-align: center;
+  touch-action: manipulation;
+  transition: background 200ms, border-color 200ms;
+  user-select: none;
+  vertical-align: middle;
+}
+.btn:hover {
+  background: #00aefc;
+  border-color: #0091d2;
+}
+.btn[disabled] {
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+.success {
+  color: #83e51b;
+}
+.warning {
+  color: #ff960a;
+}
+.error {
+  color: #ff0022;
+}
+.info {
+  color: #0091d2;
+}
 strong {
   font-weight: bold;
 }

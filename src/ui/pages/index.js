@@ -2,10 +2,11 @@ import Home from './Home/Home.js'
 import Stories from './Stories/Stories.js'
 import Map from './Map/Map.js'
 import About from './About/About.js'
-import LogIn from './LogIn/LogIn.js'
-import Settings from './Settings/Settings.js'
+import Account from './Account/Account.js'
 import Admin from './Admin/Admin.js'
 import NotFound from './NotFound/NotFound.js'
+
+import { isSignedIn } from '../../redux/user.js'
 
 const pages = {
 	HOME: {
@@ -29,15 +30,10 @@ const pages = {
 		title: 'Info',
 		path: '/info',
 	},
-	LOGIN: {
-		component: LogIn,
-		title: 'Log in',
-		path: '/login',
-	},
-	SETTINGS: {
-		component: Settings,
-		title: 'Instellingen',
-		path: '/instellingen',
+	ACCOUNT: {
+		component: Account,
+		title: (payload, user) => (isSignedIn(user) ? 'Instellingen' : 'Log in'), // TODO: TURN THIS INTO A FUNCTION THAT CHECKS IF THE USER IS LOGGED IN.
+		path: '/account',
 	},
 	ADMIN: {
 		component: Admin,
@@ -55,9 +51,9 @@ for (let name in pages) {
 }
 export default pages
 
-export function getTitle(page, payload) {
+export function getTitle(page, payload, user) {
 	if (typeof(page.title) === 'function')
-		return page.title(payload)
+		return page.title(payload, user)
 	return page.title
 }
 
