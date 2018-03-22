@@ -45,9 +45,12 @@ a {
   user-select: none;
   vertical-align: middle;
 }
-.btn:hover {
+.btn:hover, .btn.active {
   background: 1.2*@mainColor;
   border-color: @mainColor;
+}
+.btn.active {
+  cursor: default;
 }
 .btn[disabled] {
   box-shadow: none;

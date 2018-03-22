@@ -1,8 +1,10 @@
 import firebase from '../config/firebase.js'
 import { isSignedIn } from './user.js'
 
-const defaultSettings = {
-	showEmail: false, // TODO: EXPAND ON THIS.
+export const defaultSettings = {
+	showName: true,
+	showEmail: false,
+	showPicture: true,
 }
 
 /*
@@ -19,11 +21,12 @@ const actions = {
 		})
 	),
 	loadSettings: () => (
+		// TODO: CHECK IF WE STILL NEED THIS FUNCTION.
 		(dispatch, getState) => {
 			const user = getState().user
 			if (!isSignedIn(user))
 				return
-			firebase.database().ref(`${user.uid}/settings`).once('value').then((snapshot) => {
+			firebase.database().ref(`private/users/${user.uid}/settings`).once('value').then((snapshot) => {
 				dispatch({
 					type: 'ApplySetting',
 					source: 'firebase',
@@ -53,7 +56,7 @@ export function reducer(settings = {}, action) {
 			if (action.source === 'user') {
 				if (!isSignedIn(action.user))
 					throw new Error(`Tried to apply a setting, but the user is not signed in.`)
-				firebase.database().ref(`${action.user.uid}/settings`).update(newSetting)
+				firebase.database().ref(`private/users/${action.user.uid}/settings`).update(newSetting)
 			}
 
 			// Overwrite existing settings.

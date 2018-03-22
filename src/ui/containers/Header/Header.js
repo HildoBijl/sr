@@ -15,7 +15,7 @@ import Map from '../../icons/Map.js'
 import News from '../../icons/News.js'
 import Info from '../../icons/Info.js'
 
-import { isSignedIn } from '../../../redux/user.js'
+import { isSignedIn, isAdmin } from '../../../redux/user.js'
 
 const Header = (props) => {
 	const page = pages[props.locationType] || pages.NOTFOUND
@@ -36,7 +36,7 @@ const Header = (props) => {
 					<MenuItem link="ABOUT" icon={Info} label="Info" />
 					<MenuItem link="MAP" icon={Map} label="Kaart" />
 					{isSignedIn(props.user) ? <MenuItem link="ACCOUNT" icon={Cog} label="Instellingen" /> : <MenuItem link="ACCOUNT" icon={User} label="Log in" />}
-					{isSignedIn(props.user) /* TODO: check if admin */ ? <MenuItem link="ADMIN" icon={Key} label="Beheer" /> : ''}
+					{isAdmin(props.user) ? <MenuItem link="ADMIN" icon={Key} label="Beheer" /> : ''}
 				</nav>
 			</div>
 		</header>

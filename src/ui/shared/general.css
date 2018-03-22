@@ -62,9 +62,13 @@ a:focus {
   user-select: none;
   vertical-align: middle;
 }
-.btn:hover {
+.btn:hover,
+.btn.active {
   background: #00aefc;
   border-color: #0091d2;
+}
+.btn.active {
+  cursor: default;
 }
 .btn[disabled] {
   box-shadow: none;

@@ -19,8 +19,11 @@ class Account extends Component {
 		
 		// Check if it should still be shown. Hide it when necessary.
 		const timeUntilHide = hideNotificationAfter - (new Date() - notification.date)
-		if (timeUntilHide > 0)
-			setTimeout(this.forceUpdate.bind(this), timeUntilHide)
+		if (timeUntilHide > 0) {
+      if (this.notificationTimeout)
+        clearTimeout(this.notificationTimeout)
+      this.notificationTimeout = setTimeout(this.forceUpdate.bind(this), timeUntilHide)
+    }
 
 		// Give the notification HTML.
 		return (
@@ -28,6 +31,10 @@ class Account extends Component {
 				{notification.message}
 			</p>
 		)
+  }
+  componentWillUnmount() {
+    // We do not force an update when the object already dismounted. It is pointless, and React would throw an error too.
+    clearTimeout(this.notificationTimeout)
   }
 
   render() {

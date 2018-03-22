@@ -1,0 +1,52 @@
+// To compile this file into database.rules.json, use `npm install firebase-bolt` and then `firebase-bolt database.rules.bolt`. Compiling should happen automatically on a deploy, so this is mainly for testing.
+
+// Define object types.
+
+// ToDo: add picture to UserData.
+type Settings {
+  showName: Boolean,
+  showEmail: Boolean,
+  showPicture: Boolean
+}
+
+type PrivateUser {
+  validate() { this.role == 'user' || this.role == 'admin' }
+  name: String,
+  email: String,
+  settings: Settings,
+  role: String
+}
+
+// TODO: Add picture both in public and private.
+type PublicUser {
+  name: String | Null,
+  email: String | Null,
+}
+
+// Define helpful functions.
+
+function isSignedIn(auth) {
+  return auth != null;
+}
+
+function isCurrentUser(auth, uid) {
+  return auth != null && auth.uid == uid;
+}
+
+function isAdmin(auth) {
+  return root.child('private').child('users').child(auth.uid).child('role').val() == 'admin';
+}
+
+// Define database security rules.
+
+path /public is PublicUser {
+  read() { true }
+}
+path /public/users/{uid} is PublicUser {
+  write() { isCurrentUser(auth, uid) || isAdmin(auth) }
+}
+
+path /private/users/{uid} is PrivateUser {
+  read() { isCurrentUser(auth, uid) || isAdmin(auth) }
+  write() { isCurrentUser(auth, uid) || isAdmin(auth)}
+}
