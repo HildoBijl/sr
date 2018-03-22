@@ -23,3 +23,5 @@ const stateMap = (state) => ({
 })
 const actionMap = (dispatch) => ({})
 export default connect(stateMap, actionMap)(Settings)
+
+// TODO: REMOVE THIS FILE.
