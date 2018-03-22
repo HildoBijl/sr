@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "stille-rapers",
+  "private_key_id": "ac5a61ffd00332e403414603942cae0534a1f054",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDuJjMOm8JkMhUr\n5InUFJLiKBlG8L0T8HdvCvJgkh3M4sOmntURAgUQHo6Nq9RxklwmK+QvPY4qzHj5\ncN53EAn//fuJ8bzcdqQGDNLPcH/eLCcAVbI+1clR0dhLo/J4wg5KPcVCnA1ACDqn\nGrj86oAnPWF+LamGENp56lSTO2jh6pWnDpG+TrD8MDjYn9bfoML1UjkVCPf9pFru\nmyRVJWOUYqpYwBiYTuyiHxTabd6RQHcr9i17LCE8k4OuJN0rdEquUxv5EFMrnnhO\n3YoScxZjopfvLyjhXGmlHI5XT8RmlVZqxQOmqpX7dtit/YHNsiYjUCtYaGowQ3Zj\nZNzNNMzdAgMBAAECggEAAI999MWYlEhK5PbNfT6MJvSdtJ1J8KNTAKOntOL7J3mM\nKNb8XOUikmpj/wDdx+OmjF9zksnkDQU8rqedmm2i/GOCZU14mpM76Ri8IUlcP69e\nayGIgR3bMrJZ/jmVT0PzqSiSj4jS/ijWzIBjWZMKuKzsDxI38S0Weo164/rSkR+N\nT4lDAN9RtrtqjB9TuhaMrYSl6aSZLlmHPqTK6FXcDxvs+F6hImtIzBVssQ4LHgTa\nryxjc4rYx8kVzI66lIB5iQl9YJPv1hCnoaTYtbl3XHpJCnzI2aPMOCrgIa8xZdJ4\nAcMNiK8PkOiFfN2v8Mhhy7GglO9pHPZ4pWw5WDm3uQKBgQD6pReGRVZTK1kBZqbu\ns18b4WRPFinYoC6+TPoGVO3YzH3S0Qhrzq56deuwn//nrt/1qLNFPUcMFwBBwL3G\nbrv4LaAjcV9QdftGnoNOBF31WcQeQW3wb0fvJFpselyrfJIeJ2TdSPkWxxbdEqlu\n31KSDsKKXawdHBPR8h+kBRL6BQKBgQDzPMMdgZAUtNNu+q+3xOZYjCCl4c87qkkP\nRrOz/HRLWffL1mKchovBo73uA0VusKKN6gnbfoqC4OxSs68ODl3PXwy71z93thE7\n+xKymge1q3DobBLQA3fgNr8lf3iP9+0ZLUlA8T6RGNh6wZ/oqPZ50KK/KgxMdYzR\nA4jSzC2G+QKBgBcdepnrcxagfMjgSqzg5fiQRMv2Y02TGDx8pOJImtbPpRr4JCqt\nGPI6Rc44M0WOnyDsufu8tvyqcl+eAuJ1++fbbVVXc07cUpwkqj9br76c1LVlm1n9\nKUkotR4j+r/l8SPOxkKSJEaxfa5Ntkp/VgIaUl6oXOMiX8GQ7tIVlbZxAoGAObhx\nlM7qIf/HLM7QZAuVne2i0bqEMuR18eoVOuDtt/Phmb2GKR7Ei28P4ytjjqDb8lFX\nhX7B380AR5/cKrm+CTfFDc5GgWHzNQifp0JmEfZdFMqQrEwmZk6XjY5yTbfHy/Gz\nMHYPIt+Cf57zE4ME+mNIO5T+1iYPBIqSLXPGWgECgYEA+RmBOgM2+RjYzIC3DmEt\nDAPVkmiM4Ahcvdvwa9K1eLfulsWV2ZpamAVk6Yd3PMSfQm8VQFbWgZL+40tB1bKw\nkRVifRuOnpoRUPf+/fGAI8UgPKpl1OdVOwa7Eb31lF4ciNOe2VhwxFF1wg4RQLai\nMSl01D+A27Zaqpd18zsVMrA=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-sajyb@stille-rapers.iam.gserviceaccount.com",
+  "client_id": "112947205394683782426",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-sajyb%40stille-rapers.iam.gserviceaccount.com"
+}

@@ -36,7 +36,7 @@ const Header = (props) => {
 					<MenuItem link="ABOUT" icon={Info} label="Info" />
 					<MenuItem link="MAP" icon={Map} label="Kaart" />
 					{isSignedIn(props.user) ? <MenuItem link="ACCOUNT" icon={Cog} label="Instellingen" /> : <MenuItem link="ACCOUNT" icon={User} label="Log in" />}
-					{false /* TODO: check if admin */ ? <MenuItem link="ADMIN" icon={Key} label="Beheer" /> : ''}
+					{isSignedIn(props.user) /* TODO: check if admin */ ? <MenuItem link="ADMIN" icon={Key} label="Beheer" /> : ''}
 				</nav>
 			</div>
 		</header>
