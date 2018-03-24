@@ -89,9 +89,12 @@ class Account extends Component {
           </div>
           <div className="btn" onClick={this.props.signOut}>Log uit</div>
         </div>
-				<p>De instellingenpagina gaat nog gemaakt worden.</p>
+        <p>Welke informatie wil je zichtbaar laten zijn voor anderen?</p>
+        <p>[ToDo: Dit gaat nog gemaakt worden]</p>
+        <p>Dit is alleen van toepassing als je de interactieve kaart invult. Als je dit niet doet, dan zijn je gegevens sowieso niet zichtbaar voor andere bezoekers.</p>
       </div>
     )
+    // TODO: Add link to "interactieve kaart".
   }
 }
 

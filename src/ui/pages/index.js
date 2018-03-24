@@ -6,7 +6,7 @@ import Account from './Account/Account.js'
 import Admin from './Admin/Admin.js'
 import NotFound from './NotFound/NotFound.js'
 
-import { isSignedIn } from '../../redux/user.js'
+import { isSignedIn, isAdmin } from '../../redux/user.js'
 
 const pages = {
 	HOME: {
@@ -39,6 +39,7 @@ const pages = {
 		component: Admin,
 		title: 'Beheer',
 		path: '/beheer',
+		restriction: (user) => isAdmin(user),
 	},
 	NOTFOUND: {
 		component: NotFound,

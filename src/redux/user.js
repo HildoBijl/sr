@@ -118,6 +118,13 @@ const actions = {
 	// Actions for the database tracking of users.
 	checkUserData,
 	setRole,
+	resign: () => (
+		(dispatch, getState) => {
+			// First call firebase to resign. We assume the command will make it, so we won't wait for confirmation. This is to increase the responsiveness of the website.
+			const user = getState().user
+			firebase.database().ref(`private/users/${user.uid}`).update({role: 'user'}).then(() => dispatch(setRole('user')))
+		}
+	),
 }
 
 function signIn(provider, redirect = false) {
@@ -188,7 +195,7 @@ export function reducer(user = { ready: false }, action) {
 				name: firebaseUser.displayName,
 				email: firebaseUser.email,
 				uid: firebaseUser.uid,
-				role: 'user', // For now assume the user is just a user and not an admin.
+				role: 'unknown',
 				notification: user.notification,
 			}
 		}
@@ -250,6 +257,9 @@ export function isFirebaseReady(user) {
 }
 export function isSignedIn(user) {
 	return !!user.uid
+}
+export function isRoleKnown(user) {
+	return user.role !== 'unknown'
 }
 export function isAdmin(user) {
 	return user.role === 'admin'

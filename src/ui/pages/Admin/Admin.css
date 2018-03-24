@@ -1,3 +1,20 @@
+.pagePadding {
+  padding: 15px 8px;
+}
+@media (min-width: 480.01px) and (max-width: 960px) {
+  .pagePadding {
+    padding: 20px 16px;
+  }
+}
+@media (min-width: 960.01px) {
+  .pagePadding {
+    padding: 28px 24px;
+  }
+}
+.notSelectable {
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
 .admin .adminButtons {
   display: flex;
   flex-flow: row wrap;
@@ -8,6 +25,57 @@
   flex-grow: 1;
   margin: 6px 8px;
   max-width: 280px;
+}
+.admin .users {
+  align-items: stretch;
+  display: flex;
+  flex-flow: column nowrap;
+  margin-top: 20px;
+}
+.admin .users .user {
+  border-color: #33a7db;
+  border-style: solid;
+  border-width: 1px 1px 0;
+  display: flex;
+  flex-flow: row nowrap;
+  padding: 4px;
+}
+.admin .users .user:last-child {
+  border-width: 1px 1px;
+}
+.admin .users .user:nth-child(odd) {
+  background: #cce9f6;
+}
+.admin .users .user:nth-child(even) {
+  background: #b3def2;
+}
+.admin .users .user .field {
+  padding: 2px;
+}
+.admin .users .user .field.name {
+  width: calc(40% - 32px);
+}
+@media (min-width: 960.01px) {
+  .admin .users .user .field.name {
+    width: calc(40% - 40px);
+  }
+}
+.admin .users .user .field.email {
+  width: calc(60% - 48px);
+}
+@media (min-width: 960.01px) {
+  .admin .users .user .field.email {
+    width: calc(60% - 60px);
+  }
+}
+.admin .users .user .field.role {
+  text-align: center;
+  width: 80px;
+}
+@media (min-width: 960.01px) {
+  .admin .users .user .field.role {
+    width: 100px;
+  }
 }
 label {
   clear: both;

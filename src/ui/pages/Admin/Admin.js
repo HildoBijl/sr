@@ -6,6 +6,8 @@ import FileUploader from 'react-firebase-file-uploader'
 import classnames from 'classnames'
 
 import firebase from '../../../config/firebase.js'
+import { stringCompare } from '../../../util.js'
+import userActions, { isAdmin } from '../../../redux/user.js'
 
 // TODO NEXT: SET UP DATABASE STRUCTURE USING BOLT.
 // Firebase has an admin interface, but it can only run server-side. So client-side you cannot really manage users. The only exception is if you make your own database around it, storing everything in your own tables. So that's the plan. 
@@ -16,21 +18,27 @@ import firebase from '../../../config/firebase.js'
 // Optionally, the alternative is to set up cloud functions. Then through cloud functions we can make a call to list all users, and the cloud function then processes it. This may actually also be necessary to post pictures for the news overview. So it could be worthwhile to figure this out too first. 
 
 const pages = [
+	'Gebruikersbeheer',
 	'Nieuwe ervaring',
 	'Nieuw nieuwsbericht',
-	'Gebruikersbeheer',
 ]
 
 class Admin extends Component {
 	state = {
 		pageIndex: 0,
-		userDataAvailable: false,
+		usersLoaded: -1, // The -1 value denotes that we don't even know which users there are, let alone have loaded their data.
 
 		username: '',
 		avatar: '',
 		isUploading: false,
 		progress: 0,
 		avatarURL: '',
+	}
+
+	constructor(props) {
+		super(props)
+		this.promoteUser = this.promoteUser.bind(this)
+		this.verifyResignation = this.verifyResignation.bind(this)
 	}
 
 	componentDidMount() {
@@ -42,15 +50,22 @@ class Admin extends Component {
 				for (var uid in this.users) {
 					this.uidArray.push(uid)
 				}
+
 				// Extract the private data for all uids.
 				this.uidArray.forEach(uid => {
 					this.users[uid].loading = true
+					this.users[uid].uid = uid
 					firebase.database().ref(`private/users/${uid}`).once('value').then((snapshot) => {
 						this.users[uid] = snapshot.val()
+						this.users[uid].uid = uid
+						this.setState({
+							usersLoaded: this.state.usersLoaded + 1,
+						})
 					})
 				})
-				// Note that we at least have some user data.
-				this.setState({ userDataAvailable: true })
+
+				// Note that we at least know which users there are. We just haven't loaded their data yet.
+				this.setState({ usersLoaded: 0 })
 			})
 		}
 	}
@@ -59,6 +74,21 @@ class Admin extends Component {
 		this.setState({
 			pageIndex
 		})
+	}
+
+	promoteUser(user) {
+		if (window.confirm(`Weet je zeker dat je ${user.name} beheerder wilt maken van de website? De enige manier om dit weer ongedaan te maken is als ${user.name} zelf weer ontslag neemt als beheerder.\nDe gebruiker krijgt overigens geen automatisch bericht van zijn/haar promotie, dus je mag ${user.name} hier zelf nog een bericht over sturen.`)) {
+			// Send the call to Firebase. We simply assume it works out. The app is too basic for complicated connection problem checks.
+			firebase.database().ref(`private/users/${user.uid}`).update({role: 'admin'})
+
+			// Update the data in this app, so the change is shown on the screen.
+			user.role = 'admin'
+			this.forceUpdate()
+		}
+	}
+	verifyResignation() {
+		if (window.confirm('Weet je zeker dat je ontslag wilt nemen als beheerder? Je kunt hierna niet meer bij de beheer-sectie van de website. De enige manier om dit ongedaan te maken is als een andere beheerder je de rechten weer teruggeeft.'))
+			this.props.resign()
 	}
 
 	handleChangeUsername = (event) => this.setState({ username: event.target.value });
@@ -88,13 +118,28 @@ class Admin extends Component {
 	renderSubPage() {
 		switch (this.state.pageIndex) {
 			case 0:
+				if (!this.state.usersLoaded === -1)
+					return <div className="users loading"><p>Laden van gebruikers...</p></div>
+				const users = []
+				for (var uid in this.users) {
+					users.push(this.users[uid])
+				}
+				const rows = users.sort((a, b) => stringCompare(a.name, b.name)).map(user => this.renderUserEntry(user))
+				return (
+					<div>
+						{this.renderResignButton()}
+						<div className="users">{rows}</div>
+					</div>
+				)
+
+			case 1:
 				return (
 					<div>
 						<p>Nieuwe ervaring</p>
 					</div>
 				)
 
-			case 1:
+			case 2:
 				return (
 					<div>
 						<p>Nieuw nieuwsbericht</p>
@@ -122,28 +167,28 @@ class Admin extends Component {
 					</div>
 				)
 
-			case 2:
-				if (!this.state.userDataAvailable)
-					return <div><p>Laden van gebruikers...</p></div>
-				const users = []
-				for (var uid in this.users) {
-					users.push(this.renderUserEntry(uid))
-				}
-				return <div>{users}</div>
-
 			default:
 				return <div><p>Er is iets mis gegaan bij het laden van de pagina. Gebruik de knoppen hierboven om een actie te selecteren.</p></div>
 		}
 	}
-	renderUserEntry(uid) {
-		const user = this.users[uid]
-		if (user.loading)
-			return <div key={uid} className="user">Laden van data voor {user.name || '[anonieme gebruiker]'}...</div>
+	renderResignButton() {
+		if (!isAdmin(this.props.user))
+			return ''
 		return (
-			<div key={uid} className="user">
-				<div className="name">{user.name}</div>
-				<div className="email">{user.email}</div>
-				<div className="role">{user.role === 'admin' ? 'Admin' : 'Gebruiker'}</div>
+			<div className="resignButton">
+				<p>Je bent beheerder van deze website. Dat betekent dat je nieuwe ervaringen en nieuwsberichten kunt toevoegen, via het menu hierboven.</p>
+				<p>Mocht je geen beheerder meer willen zijn, dan is het ook mogelijk om <span className="btn" onClick={this.verifyResignation}>ontslag te nemen</span>. Je zegt je beheerdersrechten hiermee dan op.</p>
+			</div>
+		)
+	}
+	renderUserEntry(user) {
+		if (user.loading)
+			return <div key={user.uid} className="user">Laden van data voor {user.name || '[anonieme gebruiker]'}...</div>
+		return (
+			<div key={user.uid} className="user">
+				<div className="field name">{user.name}</div>
+				<div className="field email">{user.email}</div>
+				<div className="field role">{user.role === 'admin' ? 'Beheerder' : <span className="btn promote" onClick={() => this.promoteUser(user)}>+</span>}</div>
 			</div>
 		)
 	}
@@ -151,6 +196,9 @@ class Admin extends Component {
 
 const stateMap = (state) => ({
 	settings: state.settings,
+	user: state.user,
 })
-const actionMap = (dispatch) => ({})
+const actionMap = (dispatch) => ({
+	resign: () => dispatch(userActions.resign()),
+})
 export default connect(stateMap, actionMap)(Admin)
