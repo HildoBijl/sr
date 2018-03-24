@@ -86,4 +86,34 @@
 			display: block;
 		}
 	}
+
+	// Style for the settings part.
+	.settings {
+		align-items: center;
+		display: flex;
+		flex-flow: row nowrap;
+
+		.checkboxes {
+			flex-grow: 1;
+			flex-shrink: 1;
+
+			.explanation {
+				margin-bottom: 16px;
+			}
+		}
+
+		.picture {
+			border-radius: 25%;
+			flex-shrink: 0;
+			height: 100px;
+			margin: 0 0 0 16px;
+			opacity: 0.5;
+			transition: opacity @slowTime;
+			width: 100px;
+
+			&.visible {
+				opacity: 1;
+			}
+		}
+	}
 }

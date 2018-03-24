@@ -12,9 +12,9 @@ export const defaultSettings = {
  */
 
 const actions = {
-	applySetting: (setting) => (
+	applySettings: (setting) => (
     (dispatch, getState) => dispatch({
-			type: 'ApplySetting',
+			type: 'ApplySettings',
 			setting,
 			source: 'user',
 			user: getState().user,
@@ -28,7 +28,7 @@ const actions = {
 				return
 			firebase.database().ref(`private/users/${user.uid}/settings`).once('value').then((snapshot) => {
 				dispatch({
-					type: 'ApplySetting',
+					type: 'ApplySettings',
 					source: 'firebase',
 					setting: snapshot.val()
 				})
@@ -45,7 +45,7 @@ export default actions
 export function reducer(settings = {}, action) {
   switch (action.type) {
 
-    case 'ApplySetting': {
+    case 'ApplySettings': {
 			const newSetting = action.setting
 
 			// Check if the settings are valid.

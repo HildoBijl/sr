@@ -34,6 +34,8 @@ body {
   }
 }
 a {
+  color: #0091d2;
+  font-weight: bold;
   text-decoration: none;
 }
 a:hover,
@@ -44,6 +46,9 @@ a,
 a:active,
 a:focus {
   outline: none;
+}
+p {
+  text-align: justify;
 }
 .btn {
   background: #0091d2;

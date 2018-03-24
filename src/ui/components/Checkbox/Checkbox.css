@@ -1,0 +1,113 @@
+.pagePadding {
+  padding: 15px 8px;
+}
+@media (min-width: 480.01px) and (max-width: 960px) {
+  .pagePadding {
+    padding: 20px 16px;
+  }
+}
+@media (min-width: 960.01px) {
+  .pagePadding {
+    padding: 28px 24px;
+  }
+}
+.notSelectable {
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+.checkboxContainer {
+  align-items: center;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  margin: 6px 0 4px;
+  transition: opacity 400ms;
+}
+@media (min-width: 960.01px) {
+  .checkboxContainer {
+    margin: 9px 0 6px;
+  }
+}
+.checkboxContainer .checkboxField {
+  background: #222;
+  border-radius: 12px;
+  display: inline-block;
+  flex-shrink: 0;
+  height: 24px;
+  line-height: 24px;
+  position: relative;
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  width: 64px;
+  margin: 0 6px 0 0;
+}
+@media (min-width: 960.01px) {
+  .checkboxContainer .checkboxField {
+    margin: 0 9px 0 0;
+  }
+}
+.checkboxContainer .checkboxField:after,
+.checkboxContainer .checkboxField:before {
+  font-size: 12px;
+  height: 12px;
+  line-height: 12px;
+  position: absolute;
+  top: 6px;
+}
+.checkboxContainer .checkboxField:before {
+  color: #c8c800;
+  content: 'Ja';
+  font-weight: bold;
+  left: 10px;
+  transition: color 400ms;
+}
+.checkboxContainer .checkboxField:after {
+  color: #0091d2;
+  content: 'Nee';
+  font-weight: bold;
+  right: 7px;
+  transition: color 400ms;
+}
+.checkboxContainer .checkboxField span {
+  display: inline-block;
+}
+.checkboxContainer .checkboxField label {
+  background: #0091d2;
+  border-radius: 7px;
+  display: block;
+  height: 14px;
+  left: 5px;
+  position: absolute;
+  top: 5px;
+  transition: left 400ms, background-color 400ms;
+  width: 26px;
+  z-index: 1;
+}
+.checkboxContainer .checkboxField.checked label {
+  background: #c8c800;
+  left: 33px;
+}
+.checkboxContainer .checkboxLabel {
+  display: inline-block;
+  flex-shrink: 1;
+  line-height: 1.33333333;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  margin: 2.71428571px 0;
+}
+@media (min-width: 960.01px) {
+  .checkboxContainer .checkboxLabel {
+    margin: 0.57142857px 0;
+  }
+}
+.checkboxContainer.disabled {
+  opacity: 0.3;
+}
+.checkboxContainer.enabled .checkboxField {
+  cursor: pointer;
+}
+.checkboxContainer.enabled .checkboxField label {
+  cursor: pointer;
+}
+.checkboxContainer.enabled .checkboxLabel {
+  cursor: pointer;
+}

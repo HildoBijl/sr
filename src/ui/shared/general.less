@@ -19,6 +19,8 @@ body {
 }
 
 a {
+  color: @mainColor;
+  font-weight: bold;
   text-decoration: none;
   &:hover, &:active {
     text-decoration: underline;
@@ -26,6 +28,10 @@ a {
   &, &:active, &:focus { // To prevent a dotted border from appearing after clicking on the link.
     outline: none;
   }
+}
+
+p {
+  text-align: justify;
 }
 
 .btn {

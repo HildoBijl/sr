@@ -2,20 +2,12 @@ import './Admin.css'
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import FileUploader from 'react-firebase-file-uploader'
+// import FileUploader from 'react-firebase-file-uploader' // TODO
 import classnames from 'classnames'
 
 import firebase from '../../../config/firebase.js'
 import { stringCompare } from '../../../util.js'
 import userActions, { isAdmin } from '../../../redux/user.js'
-
-// TODO NEXT: SET UP DATABASE STRUCTURE USING BOLT.
-// Firebase has an admin interface, but it can only run server-side. So client-side you cannot really manage users. The only exception is if you make your own database around it, storing everything in your own tables. So that's the plan. 
-// Design a database set-up.
-// On creating account, create relevant object.
-// On log-in, update the relevant user data in a table.
-// List this data in the admin overview.
-// Optionally, the alternative is to set up cloud functions. Then through cloud functions we can make a call to list all users, and the cloud function then processes it. This may actually also be necessary to post pictures for the news overview. So it could be worthwhile to figure this out too first. 
 
 const pages = [
 	'Gebruikersbeheer',
@@ -28,6 +20,7 @@ class Admin extends Component {
 		pageIndex: 0,
 		usersLoaded: -1, // The -1 value denotes that we don't even know which users there are, let alone have loaded their data.
 
+		// TODO: ARRANGE PICTURE UPLOAD.
 		username: '',
 		avatar: '',
 		isUploading: false,
@@ -135,15 +128,17 @@ class Admin extends Component {
 			case 1:
 				return (
 					<div>
-						<p>Nieuwe ervaring</p>
+						{/* TODO */}
+						<p>Dit gedeelte gaat nog gemaakt worden.</p>
 					</div>
 				)
 
 			case 2:
 				return (
 					<div>
-						<p>Nieuw nieuwsbericht</p>
-						<form>
+						<p>Dit gedeelte gaat nog gemaakt worden.</p>
+						{/* TODO */}
+						{/* <form>
 							<label>Username:</label>
 							<input type="text" value={this.state.username} name="username" onChange={this.handleChangeUsername} />
 							<label>Avatar:</label>
@@ -163,7 +158,7 @@ class Admin extends Component {
 								onUploadSuccess={this.handleUploadSuccess}
 								onProgress={this.handleProgress}
 							/>
-						</form>
+						</form> */}
 					</div>
 				)
 
@@ -177,7 +172,7 @@ class Admin extends Component {
 		return (
 			<div className="resignButton">
 				<p>Je bent beheerder van deze website. Dat betekent dat je nieuwe ervaringen en nieuwsberichten kunt toevoegen, via het menu hierboven.</p>
-				<p>Mocht je geen beheerder meer willen zijn, dan is het ook mogelijk om <span className="btn" onClick={this.verifyResignation}>ontslag te nemen</span>. Je zegt je beheerdersrechten hiermee dan op.</p>
+				<p>Mocht je geen beheerder meer willen zijn, dan kun je <span className="btn" onClick={this.verifyResignation}>ontslag nemen</span>. Je zegt je beheerdersrechten hiermee dan op.</p>
 			</div>
 		)
 	}

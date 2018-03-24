@@ -1,0 +1,111 @@
+@import '../../shared/params.less';
+
+@height: 24px;
+@width: 64px;
+@fontSize: 12px;
+@sliderHeight: 14px;
+@sliderWidth: 26px;
+@offColor: @mainColor;
+@onColor: @secondaryColor;
+
+.checkboxContainer {
+  align-items: center;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  margin: 6px 0 4px;
+  @media @desktop {
+    margin: 9px 0 6px;
+  }
+  transition: opacity @slowTime;
+
+  .checkboxField {
+		background: #222;
+    border-radius: @height/2;
+    display: inline-block;
+    flex-shrink: 0;
+    height: @height;
+    line-height: @height;
+    position: relative;
+    user-select: none;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    width: @width;
+    
+    margin: 0 6px 0 0;
+    @media @desktop {
+      margin: 0 9px 0 0;
+    }
+
+    &:after, &:before {
+      font-size: @fontSize;
+      height: @fontSize;
+      line-height: @fontSize;
+      position: absolute;
+      top: (@height - @fontSize)/2;
+    }
+    &:before {
+			color: @onColor;
+      content: 'Ja';
+      font-weight: bold;
+      left: @height/2 - 2px;
+      transition: color @slowTime;
+    }
+    &:after {
+			color: @offColor;
+      content: 'Nee';
+      font-weight: bold;
+      right: @height/2 - 5px;
+      transition: color @slowTime;
+    }
+
+    span {
+      display: inline-block; // No idea why we need this line, but it does make a big difference.
+    }
+
+    label {
+			background: @offColor;
+      border-radius: @sliderHeight/2;
+      display: block;
+      height: @sliderHeight;
+      left: (@height - @sliderHeight)/2;
+      position: absolute;
+      top: (@height - @sliderHeight)/2;
+      transition: left @slowTime, background-color @slowTime;
+      width: @sliderWidth;
+      z-index: 1;
+    }
+
+    &.checked label {
+			background: @onColor;
+      left: @width - @sliderWidth - (@height - @sliderHeight)/2;
+    }
+  }
+
+  .checkboxLabel {
+    display: inline-block;
+    flex-shrink: 1;
+    line-height: 8/6;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+
+    margin: (@height - @lineHeight*@phoneFontSize)/2 0;
+    @media @desktop {
+      margin: (@height - @lineHeight*@desktopFontSize)/2 0;
+    }
+  }
+
+  // Differences between enabled and disabled.
+  &.disabled {
+    opacity: 0.3;
+  }
+  &.enabled {
+    .checkboxField {
+      cursor: pointer;
+      label {
+        cursor: pointer;
+      }
+    }
+    .checkboxLabel {
+      cursor: pointer;
+    }
+  }
+}

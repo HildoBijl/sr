@@ -91,3 +91,27 @@
     display: block;
   }
 }
+.account .settings {
+  align-items: center;
+  display: flex;
+  flex-flow: row nowrap;
+}
+.account .settings .checkboxes {
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+.account .settings .checkboxes .explanation {
+  margin-bottom: 16px;
+}
+.account .settings .picture {
+  border-radius: 25%;
+  flex-shrink: 0;
+  height: 100px;
+  margin: 0 0 0 16px;
+  opacity: 0.5;
+  transition: opacity 400ms;
+  width: 100px;
+}
+.account .settings .picture.visible {
+  opacity: 1;
+}

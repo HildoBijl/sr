@@ -3,34 +3,38 @@ import './Account.css'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
+import Link from 'redux-first-router-link'
+
+import Checkbox from '../../components/Checkbox/Checkbox.js'
 
 import userActions, { isSignedIn, isFirebaseReady } from '../../../redux/user.js'
+import settingsActions, { getSettings } from '../../../redux/settings.js'
 
 const hideNotificationAfter = 6000 // The number of milliseconds after which we hide the notification.
 
 class Account extends Component {
-  
+
   // The following functions are about rendering stuff.
   getNotification() {
     // Check if a notification exists.
-		const notification = this.props.user.notification
-		if (!notification)
-			return <p className="notification hidden"></p>
-		
-		// Check if it should still be shown. Hide it when necessary.
-		const timeUntilHide = hideNotificationAfter - (new Date() - notification.date)
-		if (timeUntilHide > 0) {
+    const notification = this.props.user.notification
+    if (!notification)
+      return <p className="notification hidden"></p>
+
+    // Check if it should still be shown. Hide it when necessary.
+    const timeUntilHide = hideNotificationAfter - (new Date() - notification.date)
+    if (timeUntilHide > 0) {
       if (this.notificationTimeout)
         clearTimeout(this.notificationTimeout)
       this.notificationTimeout = setTimeout(this.forceUpdate.bind(this), timeUntilHide)
     }
 
-		// Give the notification HTML.
-		return (
-			<p className={classnames("notification", notification.type, { "hidden": timeUntilHide <= 0 })}>
-				{notification.message}
-			</p>
-		)
+    // Give the notification HTML.
+    return (
+      <p className={classnames("notification", notification.type, { "hidden": timeUntilHide <= 0 })}>
+        {notification.message}
+      </p>
+    )
   }
   componentWillUnmount() {
     // We do not force an update when the object already dismounted. It is pointless, and React would throw an error too.
@@ -59,11 +63,11 @@ class Account extends Component {
       <div className="account">
         {this.getNotification()}
         <div className="loadingIndicator">
-          <span className="loadingMessage">We zijn even aan het checken of je ingelogd bent...</span>
+          <span className="loadingMessage">Inlogdata checken...</span>
         </div>
       </div>
     )
-  }
+  } dddd
   renderSignInPage() {
     return (
       <div className="account">
@@ -80,6 +84,7 @@ class Account extends Component {
   }
   renderAccountPage() {
     const user = this.props.user
+    const settings = this.props.settings
     return (
       <div className="account">
         {this.getNotification()}
@@ -89,23 +94,42 @@ class Account extends Component {
           </div>
           <div className="btn" onClick={this.props.signOut}>Log uit</div>
         </div>
-        <p>Welke informatie wil je zichtbaar laten zijn voor anderen?</p>
-        <p>[ToDo: Dit gaat nog gemaakt worden]</p>
-        <p>Dit is alleen van toepassing als je de interactieve kaart invult. Als je dit niet doet, dan zijn je gegevens sowieso niet zichtbaar voor andere bezoekers.</p>
+        <p className="explanation">Je kunt op de <Link to={{ type: 'MAP' }}>interactieve kaart</Link> markeren in welke gebieden jij actief bent als raper. Zo kun je aan anderen laten zien dat ze niet alleen bezig zijn. Hierbij laten we de volgende informatie van je zien.</p>
+        <div className="settings">
+          <div className="checkboxes">
+            <Checkbox
+              label="Je naam"
+              checked={settings.showName}
+              changeFunction={(newVal) => this.props.applySettings({ showName: newVal })}
+            />
+            <Checkbox
+              label="Je afbeelding"
+              checked={settings.showPicture}
+              changeFunction={(newVal) => this.props.applySettings({ showPicture: newVal })}
+            />
+            <Checkbox
+              label="Je email-adres"
+              checked={settings.showEmail}
+              changeFunction={(newVal) => this.props.applySettings({ showEmail: newVal })}
+            />
+          </div>
+          <img className={classnames('picture', {visible: settings.showPicture})} src={user.picture} alt="Profielfoto" />
+        </div>
+        <p>De afbeelding hebben we van Google/Facebook doorgekregen toen je inlogde.</p>
       </div>
     )
-    // TODO: Add link to "interactieve kaart".
   }
 }
 
 const stateMap = (state) => ({
-	online: state.status.online,
-	settings: state.settings,
-	user: state.user,
+  online: state.status.online,
+  settings: getSettings(state.settings),
+  user: state.user,
 })
 const actionMap = (dispatch) => ({
-	signInGoogle: (redirect) => dispatch(userActions.signInGoogle(redirect)),
-	signInFacebook: (redirect) => dispatch(userActions.signInFacebook(redirect)),
-	signOut: () => dispatch(userActions.signOut()),
+  signInGoogle: (redirect) => dispatch(userActions.signInGoogle(redirect)),
+  signInFacebook: (redirect) => dispatch(userActions.signInFacebook(redirect)),
+  signOut: () => dispatch(userActions.signOut()),
+  applySettings: (newSettings) => dispatch(settingsActions.applySettings(newSettings)),
 })
 export default connect(stateMap, actionMap)(Account)

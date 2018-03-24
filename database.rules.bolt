@@ -2,7 +2,6 @@
 
 // Define object types.
 
-// ToDo: add picture to UserData.
 type Settings {
   showName: Boolean,
   showEmail: Boolean,
@@ -13,14 +12,15 @@ type PrivateUser {
   validate() { this.role == 'user' || this.role == 'admin' }
   name: String,
   email: String,
+  picture: String,
   settings: Settings,
   role: String
 }
 
-// TODO: Add picture both in public and private.
 type PublicUser {
   name: String | Null,
   email: String | Null,
+  picture: String | Null,
 }
 
 // Define helpful functions.

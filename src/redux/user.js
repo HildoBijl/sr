@@ -40,19 +40,18 @@ const checkUserData = () => (
 					privateUser.email = user.email
 					change = true
 				}
-				// TODO
-				// if (privateUser.picture !== user.picture) {
-				// 	update.picture = user.picture
-				// 	privateUser.picture = user.picture
-				// 	change = true
-				// }
+				if (privateUser.picture !== user.picture) {
+					update.picture = user.picture
+					privateUser.picture = user.picture
+					change = true
+				}
 				if (change) {
 					privateRef.update(update)
 				}
 			}
 
 			// Process the settings and role that were loaded from the database.
-			dispatch(settingActions.applySetting(privateUser.settings))
+			dispatch(settingActions.applySettings(privateUser.settings))
 			dispatch(setRole(privateUser.role))
 
 			// Check the public data of the user.
@@ -76,11 +75,10 @@ const checkUserData = () => (
 						update.email = desiredPublicUser.email || null
 						change = true
 					}
-					// TODO
-					// if (publicUser.picture !== desiredPublicUser.picture) {
-					// 	update.picture = desiredPublicUser.picture || null
-					// 	change = true
-					// }
+					if (publicUser.picture !== desiredPublicUser.picture) {
+						update.picture = desiredPublicUser.picture || null
+						change = true
+					}
 					if (change) {
 						publicRef.update(update)
 					}
@@ -153,9 +151,8 @@ function getPublicUser(privateUser) {
 		publicUser.name = privateUser.name
 	if (privateUser.settings.showEmail)
 		publicUser.email = privateUser.email
-	// TODO
-	// if (privateUser.settings.showPicture)
-	// 	publicUser.picture = privateUser.picture
+	if (privateUser.settings.showPicture)
+		publicUser.picture = privateUser.picture
 	return publicUser
 }
 
@@ -194,6 +191,7 @@ export function reducer(user = { ready: false }, action) {
 				ready: true,
 				name: firebaseUser.displayName,
 				email: firebaseUser.email,
+				picture: firebaseUser.photoURL,
 				uid: firebaseUser.uid,
 				role: 'unknown',
 				notification: user.notification,
