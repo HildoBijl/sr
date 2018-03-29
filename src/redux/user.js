@@ -141,6 +141,7 @@ function getDefaultDBUser(user) {
 	return {
 		name: user.name,
 		email: user.email,
+		picture: user.picture,
 		role: 'user',
 		settings: {...defaultSettings}
 	}

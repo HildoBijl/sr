@@ -1,5 +1,5 @@
 import Home from './Home/Home.js'
-import Stories from './Stories/Stories.js'
+import Experiences from './Experiences/Experiences.js'
 import Map from './Map/Map.js'
 import About from './About/About.js'
 import Account from './Account/Account.js'
@@ -15,8 +15,8 @@ const pages = {
 		skipPrefix: true, // Do not use a prefix in the <title>.
 		path: '/(index.html)?', // Make both the base path '/' and '/index.html' point to the Home page. The latter is called when a PWA starts up on a smartphone as local app.
 	},
-	STORIES: {
-		component: Stories,
+	EXPERIENCES: {
+		component: Experiences,
 		title: 'Ervaringen',
 		path: '/ervaringen',
 	},
@@ -37,8 +37,32 @@ const pages = {
 	},
 	ADMIN: {
 		component: Admin,
-		title: 'Beheer',
-		path: '/beheer',
+		title: 'Gebruikersbeheer',
+		path: '/beheer/gebruikers',
+		restriction: (user) => isAdmin(user),
+	},
+	NEWNEWS: {
+		component: Admin,
+		title: 'Nieuw nieuwsbericht',
+		path: '/beheer/nieuws',
+		restriction: (user) => isAdmin(user),
+	},
+	EDITNEWS: {
+		component: Admin,
+		title: 'Wijzig nieuwsbericht',
+		path: '/beheer/nieuws/:item',
+		restriction: (user) => isAdmin(user),
+	},
+	NEWEXPERIENCE: {
+		component: Admin,
+		title: 'Nieuwe ervaring',
+		path: '/beheer/ervaring',
+		restriction: (user) => isAdmin(user),
+	},
+	EDITEXPERIENCE: {
+		component: Admin,
+		title: 'Wijzig ervaring',
+		path: '/beheer/ervaring/:item',
 		restriction: (user) => isAdmin(user),
 	},
 	NOTFOUND: {

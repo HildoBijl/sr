@@ -1,0 +1,53 @@
+@import '../../../shared/params.less';
+
+.userControl {
+	.users {
+		align-items: stretch;
+		display: flex;
+		flex-flow: column nowrap;
+		margin-top: 20px;
+
+		.user {
+			border-color: white - 0.8*(white - @mainColor);
+			border-style: solid;
+			border-width: 1px 1px 0;
+			display: flex;
+			flex-flow: row nowrap;
+			padding: 4px;
+
+			&:last-child {
+				border-width: 1px 1px;
+			}
+			&:nth-child(odd) {
+				background: white - 0.2*(white - @mainColor);
+			}
+			&:nth-child(even) {
+				background: white - 0.3*(white - @mainColor);
+			}
+
+			.field {
+				padding: 2px;
+
+				&.name {
+					width: calc(~"40% - 32px");
+					@media @desktop {
+						width: calc(~"40% - 40px");
+					}
+				}
+				&.email {
+					width: calc(~"60% - 48px");
+					@media @desktop {
+						width: calc(~"60% - 60px");
+					}
+				}
+				&.role {
+					text-align: center;
+					width: 80px;
+					@media @desktop {
+						width: 100px;
+					}
+				}
+			}
+		}
+	}
+}

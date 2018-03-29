@@ -32,7 +32,7 @@ const Header = (props) => {
 					</Helmet>
 				</div>
 				<nav className="menu">
-					<MenuItem link="STORIES" icon={News} label="Ervaringen" />
+					<MenuItem link="EXPERIENCES" icon={News} label="Ervaringen" />
 					<MenuItem link="ABOUT" icon={Info} label="Info" />
 					<MenuItem link="MAP" icon={Map} label="Kaart" />
 					{isSignedIn(props.user) ? <MenuItem link="ACCOUNT" icon={Cog} label="Instellingen" /> : <MenuItem link="ACCOUNT" icon={User} label="Log in" />}
