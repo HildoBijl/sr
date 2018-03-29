@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 
 import UserControl from './UserControl/UserControl.js'
+import News from './News/News.js'
 
 const adminPages = [
 	{
@@ -15,7 +16,7 @@ const adminPages = [
 	{
 		key: 'NEWNEWS',
 		title: 'Nieuw nieuwsbericht',
-		component: <div><p>Dit nieuws gedeelte gaat nog gemaakt worden.</p></div>,
+		component: <News />,
 	},
 	{
 		key: 'NEWEXPERIENCE',

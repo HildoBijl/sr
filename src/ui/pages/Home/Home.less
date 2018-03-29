@@ -1,2 +1,59 @@
+@import '../../shared/params.less';
+
 .home {
+	.intro {
+		margin-bottom: 20px;
+	}
+
+	.news {
+		align-items: stretch;
+		display: flex;
+		flex-flow: column nowrap;
+
+		.item {
+			margin-bottom: 20px;
+
+			@media @phonePortrait {
+				display: flex;
+				flex-flow: column nowrap;
+
+				.title {
+					margin-top: 0;
+					order: 1;
+				}
+				img {
+					margin: 0px;
+					order: 2;
+					width: 100%;
+				}
+				p {
+					order: 3;
+				}
+			}
+
+			@media @landscape {
+
+				title {
+					margin-top: 0;
+				}
+				img {
+					float: right;
+					margin: 0 0 12px 12px;
+				}
+			}
+
+			@media @phoneLandscape {
+				img {
+					max-height: 200px;
+					max-width: 240px;
+				}
+			}
+			@media @desktop {
+				img {
+					max-height: 300px;
+					max-width: 480px;
+				}
+			}
+		}
+	}
 }

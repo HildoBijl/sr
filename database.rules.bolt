@@ -2,6 +2,10 @@
 
 // Define object types.
 
+type Date extends String {
+  validate() { return isISODate(this) }
+}
+
 type Settings {
   showName: Boolean,
   showEmail: Boolean,
@@ -21,6 +25,13 @@ type PublicUser {
   name: String | Null,
   email: String | Null,
   picture: String | Null,
+}
+
+type Story {
+  title: String,
+  story: String,
+  picture: String | Null,
+  date: Number,
 }
 
 // Define helpful functions.
@@ -48,5 +59,21 @@ path /public/users/{uid} is PublicUser {
 
 path /private/users/{uid} is PrivateUser {
   read() { isCurrentUser(auth, uid) || isAdmin(auth) }
-  write() { isCurrentUser(auth, uid) || isAdmin(auth)}
+  write() { isCurrentUser(auth, uid) || isAdmin(auth) }
+}
+
+path /public/news/{id} is Story {
+  index() { "date" }
+  write() { isAdmin(auth) }
+}
+path /public/experiences/{id} is Story {
+  index() { "date" }
+  write() { isAdmin(auth) }
+}
+
+path /public/news {
+  index() { "date" }
+}
+path /public/experiences {
+  index() { "date" }
 }

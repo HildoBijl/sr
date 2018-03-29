@@ -1,37 +1,123 @@
 {
   "rules": {
-    "users": {
-      "$uid": {
-        ".write": "auth != null && auth.uid == $uid || newData.parent().parent().child('users').child(auth.uid).child('role').val() == 'admin'",
-        "preferences": {
-          ".validate": "newData.hasChildren(['showName', 'showEmail', 'showPicture'])",
-          "showName": {
-            ".validate": "newData.isBoolean()"
-          },
-          "showEmail": {
-            ".validate": "newData.isBoolean()"
-          },
-          "showPicture": {
-            ".validate": "newData.isBoolean()"
-          },
-          "$other": {
-            ".validate": "false"
-          },
-          ".read": "true"
-        },
-        "userData": {
-          ".validate": "newData.hasChildren(['name', 'email']) && newData.child('excuse').val().length < 20 && newData.child('respectRating').val() < 5",
+    "public": {
+      ".validate": "newData.hasChildren()",
+      "name": {
+        ".validate": "newData.isString()"
+      },
+      "email": {
+        ".validate": "newData.isString()"
+      },
+      "picture": {
+        ".validate": "newData.isString()"
+      },
+      "$other": {
+        ".validate": "false"
+      },
+      ".read": "true",
+      "users": {
+        "$uid": {
+          ".validate": "newData.hasChildren()",
           "name": {
-            ".validate": "newData.isString()",
-            ".read": "auth != null && auth.uid == $uid || root.child('users').child(auth.uid).child('role').val() == 'admin' || data.parent().child('preferences').child('showName').val() == true"
+            ".validate": "newData.isString()"
           },
           "email": {
-            ".validate": "newData.isString()",
-            ".read": "auth != null && auth.uid == $uid || root.child('users').child(auth.uid).child('role').val() == 'admin' || data.parent().child('preferences').child('showEmail').val() == true"
+            ".validate": "newData.isString()"
+          },
+          "picture": {
+            ".validate": "newData.isString()"
           },
           "$other": {
             ".validate": "false"
-          }
+          },
+          ".write": "auth != null && auth.uid == $uid || newData.parent().parent().parent().child('private').child('users').child(auth.uid).child('role').val() == 'admin'"
+        }
+      },
+      "news": {
+        "$id": {
+          ".validate": "newData.hasChildren(['title', 'story', 'date'])",
+          "title": {
+            ".validate": "newData.isString()"
+          },
+          "story": {
+            ".validate": "newData.isString()"
+          },
+          "picture": {
+            ".validate": "newData.isString()"
+          },
+          "date": {
+            ".validate": "newData.isNumber()"
+          },
+          "$other": {
+            ".validate": "false"
+          },
+          ".write": "newData.parent().parent().parent().child('private').child('users').child(auth.uid).child('role').val() == 'admin'",
+          ".indexOn": [
+            "date"
+          ]
+        }
+      },
+      "experiences": {
+        "$id": {
+          ".validate": "newData.hasChildren(['title', 'story', 'date'])",
+          "title": {
+            ".validate": "newData.isString()"
+          },
+          "story": {
+            ".validate": "newData.isString()"
+          },
+          "picture": {
+            ".validate": "newData.isString()"
+          },
+          "date": {
+            ".validate": "newData.isNumber()"
+          },
+          "$other": {
+            ".validate": "false"
+          },
+          ".write": "newData.parent().parent().parent().child('private').child('users').child(auth.uid).child('role').val() == 'admin'",
+          ".indexOn": [
+            "date"
+          ]
+        }
+      }
+    },
+    "private": {
+      "users": {
+        "$uid": {
+          ".validate": "newData.hasChildren(['name', 'email', 'picture', 'settings', 'role']) && (newData.child('role').val() == 'user' || newData.child('role').val() == 'admin')",
+          "name": {
+            ".validate": "newData.isString()"
+          },
+          "email": {
+            ".validate": "newData.isString()"
+          },
+          "picture": {
+            ".validate": "newData.isString()"
+          },
+          "settings": {
+            ".validate": "newData.hasChildren(['showName', 'showEmail', 'showPicture'])",
+            "showName": {
+              ".validate": "newData.isBoolean()"
+            },
+            "showEmail": {
+              ".validate": "newData.isBoolean()"
+            },
+            "showPicture": {
+              ".validate": "newData.isBoolean()"
+            },
+            "$other": {
+              ".validate": "false"
+            }
+          },
+          "role": {
+            ".validate": "newData.isString()"
+          },
+          "$other": {
+            ".validate": "false"
+          },
+          ".read": "auth != null && auth.uid == $uid || root.child('private').child('users').child(auth.uid).child('role').val() == 'admin'",
+          ".write": "auth != null && auth.uid == $uid || newData.parent().parent().parent().child('private').child('users').child(auth.uid).child('role').val() == 'admin'"
         }
       }
     }

@@ -71,40 +71,6 @@
   opacity: 0.01;
   transition: opacity 0.2s;
 }
-.page .pageFader h1 {
-  font-weight: bold;
-  margin: 32px 0 24px 0;
-  font-size: 1.9em;
-}
-@media (min-width: 480.01px) {
-  .page .pageFader h1 {
-    font-size: 1.9em;
-  }
-}
-.page .pageFader h2 {
-  font-weight: bold;
-  margin: 24px 0 16px 0;
-  font-size: 1.7em;
-}
-@media (min-width: 480.01px) {
-  .page .pageFader h2 {
-    font-size: 1.7em;
-  }
-}
-.page .pageFader h3 {
-  font-weight: bold;
-  margin: 16px 0 10px 0;
-  font-size: 1.4em;
-}
-@media (min-width: 480.01px) {
-  .page .pageFader h3 {
-    font-size: 1.4em;
-  }
-}
-.page .pageFader p {
-  line-height: 1.42857143;
-  margin: 6px 0 10px;
-}
 .page .pageFader h1:first-child,
 .page .pageFader h2:first-child,
 .page .pageFader h3:first-child,

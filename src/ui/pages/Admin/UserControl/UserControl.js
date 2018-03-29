@@ -20,7 +20,7 @@ class UserControl extends Component {
 
 	componentDidMount() {
 		this.mounted = true // We note that the object is mounted. This is so we can check if SetState is allowed.
-		if (!this.state.userDataAvailable) {
+		if (this.state.usersLoaded === -1) {
 			firebase.database().ref('public/users').once('value').then((snapshot) => {
 				// Get an array of all uids.
 				this.users = snapshot.val()
@@ -95,7 +95,7 @@ class UserControl extends Component {
 		return (
 			<div className="resignButton">
 				<p>Je bent beheerder van deze website. Dat betekent dat je nieuwe ervaringen en nieuwsberichten kunt toevoegen, via het menu hierboven.</p>
-				<p>Mocht je geen beheerder meer willen zijn, dan kun je <span className="btn" onClick={this.verifyResignation}>ontslag nemen</span>. Je zegt je beheerdersrechten hiermee dan op.</p>
+				<p>Mocht je geen beheerder meer willen zijn, dan kun je <span className="btn resign" onClick={this.verifyResignation}>ontslag nemen</span>. Je zegt je beheerdersrechten hiermee dan op.</p>
 			</div>
 		)
 	}

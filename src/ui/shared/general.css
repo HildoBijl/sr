@@ -47,7 +47,24 @@ a:active,
 a:focus {
   outline: none;
 }
+h1 {
+  font-size: 1.9em;
+  font-weight: bold;
+  margin: 2em 0 1.5em 0;
+}
+h2 {
+  font-size: 1.7em;
+  font-weight: bold;
+  margin: 1.5em 0 1em 0;
+}
+h3 {
+  font-size: 1.4em;
+  font-weight: bold;
+  margin: 1em 0 0.6em 0;
+}
 p {
+  line-height: 1.42857143;
+  margin: 0.4em 0 0.6em;
   text-align: justify;
 }
 .btn {
@@ -59,7 +76,7 @@ p {
   color: white;
   cursor: pointer;
   display: inline-block;
-  line-height: inherit;
+  line-height: 1.42857143;
   padding: 6px 12px;
   text-align: center;
   touch-action: manipulation;
@@ -79,10 +96,6 @@ p {
   box-shadow: none;
   cursor: not-allowed;
   opacity: 0.65;
-}
-span.btn {
-  padding: 0 6px;
-  vertical-align: top;
 }
 .success {
   color: #83e51b;

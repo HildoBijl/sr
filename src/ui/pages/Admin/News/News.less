@@ -1,0 +1,68 @@
+@import '../../../shared/params.less';
+
+.news {
+	.notification {
+		font-weight: bold;
+		text-align: center;
+	}
+
+	.titleContainer {
+		margin: 12px 0;
+
+		input {
+			background: #f5f5f5;
+			border: 0;
+			font-size: 1.3em;
+			font-weight: bold;
+			outline: none;
+			padding: 4px;
+			width: 100%;
+		}
+	}
+
+	.pictureUploaderContainer {
+		display: inline-block;
+		margin: 4px 0;
+		position: relative;
+
+		input#pictureUploader { // Hide the picture uploader, because it always looks crappy in browsers.
+			height: 0.1px;
+			opacity: 0;
+			overflow: hidden;
+			position: absolute;
+			width: 0.1px;
+			z-index: -1;
+		}
+
+		&.empty {
+			width: 100%;
+		}
+		
+		&.uploaded {
+			label {
+				bottom: 8px;
+				left: 50%;
+				position: absolute;
+				transform: translateX(-50%);
+			}
+
+			img {
+				height: 300px;
+				min-width: 200px;
+			}
+		}
+	}
+
+	.storyContainer {
+		margin: 12px 0;
+
+		textarea {
+			background: #f5f5f5;
+			border: 0px solid red;
+			border-radius: 8px;
+			outline: none;
+			padding: 4px;
+			width: 100%;
+		}
+	}
+}
