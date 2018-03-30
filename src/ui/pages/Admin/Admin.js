@@ -12,16 +12,31 @@ const adminPages = [
 		key: 'ADMIN',
 		title: 'Gebruikersbeheer',
 		component: <UserControl />,
+		showButton: true,
 	},
 	{
 		key: 'NEWNEWS',
 		title: 'Nieuw nieuwsbericht',
-		component: <News />,
+		component: <News type="news"/>,
+		showButton: true,
+	},
+	{
+		key: 'EDITNEWS',
+		title: 'Wijzig nieuwsbericht',
+		component: <News type="news"/>,
+		showButton: false,
 	},
 	{
 		key: 'NEWEXPERIENCE',
 		title: 'Nieuwe ervaring',
-		component: <div><p>Dit ervaringen gedeelte gaat nog gemaakt worden.</p></div>,
+		component: <News type="experiences"/>,
+		showButton: true,
+	},
+	{
+		key: 'EDITEXPERIENCE',
+		title: 'Wijzig ervaring',
+		component: <News type="experiences"/>,
+		showButton: false,
 	},
 ]
 
@@ -32,7 +47,7 @@ class Admin extends Component {
 			<div className="admin">
 				<div className="adminButtons">
 					{adminPages.map(page => (
-						<div key={page.key} className={classnames('btn', { active: pageKey === page.key })} onClick={() => this.props.goToPage(page.key)}>{page.title}</div>
+						page.showButton ? <div key={page.key} className={classnames('btn', { active: pageKey === page.key })} onClick={() => this.props.goToPage(page.key)}>{page.title}</div> : ''
 					))}
 				</div>
 				{this.renderSubPage()}

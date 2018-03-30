@@ -10,15 +10,24 @@ import formCacheActions from '../../../../redux/formCache.js'
 class News extends Component {
 	state = {}
 
+	componentDidMount() {
+		// Check if we are editing a news story and have received the data.
+		if (this.props.editing) {
+			if (!this.props.data.title || !this.props.data.story) {
+				return this.props.goToPage(this.props.getType() === 'news' ? 'NEWNEWS' : 'NEWEXPERIENCE')
+			}
+		}
+	}
+
 	handleChangeTitle = (evt) => this.props.storeFormData({ ...this.props.data, title: evt.target.value })
 	handleChangeStory = (evt) => this.props.storeFormData({ ...this.props.data, story: evt.target.value })
 
-	handleUploadStart = () => this.props.storeFormData({ ...this.props.data, isUploading: true, progress: 0, picture: '', pictureURL: '' })
+	handleUploadStart = () => this.props.storeFormData({ ...this.props.data, isUploading: 1, progress: 0, picture: '' }) // isUploading: 1 means we're uploading.
 	handleUploadProgress = (progress) => this.props.storeFormData({ ...this.props.data, progress })
-	handleUploadError = (error) => this.props.storeFormData({ ...this.props.data, isUploading: false })
+	handleUploadError = (error) => this.props.storeFormData({ ...this.props.data, isUploading: 0 })
 	handleUploadSuccess = (filename) => {
-		this.props.storeFormData({ ...this.props.data, picture: filename, progress: 100, isUploading: false })
-		firebase.storage().ref('images').child(filename).getDownloadURL().then(url => this.props.storeFormData({ ...this.props.data, pictureURL: url }))
+		this.props.storeFormData({ ...this.props.data, progress: 100, isUploading: 2 }) // isUploading: 2 means the picture has arrived on the server and we're waiting for confirmation.
+		firebase.storage().ref('images').child(filename).getDownloadURL().then(url => this.props.storeFormData({ ...this.props.data, picture: url, isUploading: 0, }))
 	}
 
 	processEntry = (evt) => {
@@ -28,7 +37,7 @@ class News extends Component {
 
 		// Check if we're uploading a picture. So if we are uploading it, or are waiting for an image URL. If so, do nothing yet.
 		const data = this.props.data
-		if (data.isUploading || (data.picture && !data.pictureURL))
+		if (data.isUploading > 0)
 			return
 
 		// Verify input.
@@ -38,21 +47,38 @@ class News extends Component {
 			return this.setState({ notification: 'Er is geen geldig verhaal.' })
 
 		// Verify absence of image, if relevant.
-		if (!data.pictureURL) {
+		if (!data.picture) {
 			if (!window.confirm('Je verhaal heeft geen bijgevoegde foto. Een afbeelding erbij maakt verhalen altijd een stuk leuker om te lezen. Weet je zeker dat je dit verhaal zonder foto online wilt zetten?'))
 				return
 		}
 
-		// Store the item.
-		firebase.database().ref(`public/news`).push({
-			title: data.title,
-			story: data.story,
-			picture: data.pictureURL,
-			date: firebase.database.ServerValue.TIMESTAMP,
-		}).then(() => {
+		// Store the item. How to do this depends on whether we're editing or adding.
+		let promise
+		if (this.props.editing) {
+			promise = firebase.database().ref(`public/${this.getType()}/${this.props.data.id}`).update({
+				title: data.title,
+				story: data.story,
+				picture: data.picture,
+			})
+		} else {
+			promise = firebase.database().ref(`public/${this.getType()}`).push({
+				title: data.title,
+				story: data.story,
+				picture: data.picture,
+				date: firebase.database.ServerValue.TIMESTAMP,
+			})
+		}
+		promise.then(() => {
 			this.props.clearFormData()
-			this.props.goToPage('HOME')
+			this.props.goToPage(this.getType() === 'news' ? 'HOME' : 'EXPERIENCES')
 		})
+	}
+
+	getType() {
+		return this.props.type || 'news'
+	}
+	getTitle() {
+		return this.getType() === 'news' ? 'nieuwsbericht' : 'ervaring'
 	}
 
 	render() {
@@ -68,7 +94,7 @@ class News extends Component {
 					<div className="storyContainer">
 						<textarea name="story" cols="50" rows="10" placeholder="Je verhaal" onChange={this.handleChangeStory} value={data.story || ''}></textarea>
 					</div>
-					<span className="btn" onClick={() => this.processEntry()} disabled={data.isUploading || (data.picture && !data.pictureURL)}>Voeg nieuwsbericht toe</span>
+					<span className="btn" onClick={() => this.processEntry()} disabled={data.isUploading > 0}>{this.props.editing ? `Wijzig ${this.getTitle()}` : `Voeg ${this.getTitle()} toe`}</span>
 				</form>
 			</div>
 		)
@@ -78,30 +104,25 @@ class News extends Component {
 		const data = this.props.data
 
 		// Check if we're in the process of uploading a picture.
-		if (data.isUploading) {
+		if (data.isUploading > 0) {
 			return (
 				<div className="pictureUploaderContainer uploading">
-					<p>Foto wordt verstuurd ... {data.progress > 0 ? `${data.progress}% is al aangekomen.` : ``}</p>
+					<p>
+						{data.isUploading === 1 ?
+							`Foto wordt verstuurd ... ${data.progress > 0 ? `${data.progress}% is al aangekomen.` : ``}` :
+							`Foto wordt opgeslagen ...`}
+					</p>
 				</div>
 			)
 		}
 
 		// Check if there is a picture.
-		if (data.pictureURL) {
-			return (
-				<div className="pictureUploaderContainer uploaded">
-					<img alt="Foto voor bij het stuk" src={data.pictureURL} />
-					{this.renderUploader()}
-					<label htmlFor="pictureUploader" className="btn">Wijzig foto</label>
-				</div>
-			)
-		}
-
-		// Check if there is a filename. This means that the picture has been uploaded, but we just haven't gotten its URL yet.
 		if (data.picture) {
 			return (
-				<div className="pictureUploaderContainer uploading">
-					<p>Foto wordt opgeslagen ...</p>
+				<div className="pictureUploaderContainer uploaded">
+					<img alt="Foto voor bij het stuk" src={data.picture} />
+					{this.renderUploader()}
+					<label htmlFor="pictureUploader" className="btn">Wijzig foto</label>
 				</div>
 			)
 		}
@@ -131,11 +152,12 @@ class News extends Component {
 }
 
 const stateMap = (state) => ({
-	data: state.formCache.newNews || {},
+	editing: state.location.type.substr(0, 4) === 'EDIT', // Are we editing news (true) or adding news (false)?
+	data: state.formCache[state.location.type] || {},
 })
 const actionMap = (dispatch) => ({
-	storeFormData: (data) => dispatch(formCacheActions.storeFormData('newNews', data)),
-	clearFormData: () => dispatch(formCacheActions.clearFormData('newNews')),
+	storeFormData: (data) => dispatch(formCacheActions.storeFormData(data)),
+	clearFormData: () => dispatch(formCacheActions.clearFormData()),
 	goToPage: (page, payload) => dispatch({ type: page, payload }),
 })
 export default connect(stateMap, actionMap)(News)

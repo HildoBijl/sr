@@ -3,15 +3,19 @@
  */
 
 const actions = {
-  storeFormData: (name, data) => ({
-		type: 'StoreFormData',
-		name,
-		data,
-	}),
-	clearFormData: (name) => ({
-		type: 'ClearFormData',
-		name,
-	}),
+	storeFormData: (data, name) => (
+		(dispatch, getState) => dispatch({
+			type: 'StoreFormData',
+			name: name || getState().location.type,
+			data,
+		})
+	),
+	clearFormData: (name) => (
+		(dispatch, getState) => dispatch({
+			type: 'ClearFormData',
+			name: name || getState().location.type,
+		})
+	),
 }
 export default actions
 
@@ -20,24 +24,24 @@ export default actions
  */
 
 export function reducer(state = {}, action) {
-  switch (action.type) {
-		
-    case 'StoreFormData': {
+	switch (action.type) {
+
+		case 'StoreFormData': {
 			state = { ...state } // Clone the state (but not a deep clone).
 			state[action.name] = action.data
 			return state
 		}
-		
+
 		case 'ClearFormData': {
 			state = { ...state } // Clone the state (but not a deep clone).
 			delete state[action.name]
 			return state
 		}
 
-    default: {
-      return state
-    }
-  }
+		default: {
+			return state
+		}
+	}
 }
 
 /*

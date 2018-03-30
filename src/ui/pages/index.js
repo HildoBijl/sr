@@ -50,7 +50,7 @@ const pages = {
 	EDITNEWS: {
 		component: Admin,
 		title: 'Wijzig nieuwsbericht',
-		path: '/beheer/nieuws/:item',
+		path: '/beheer/nieuws/wijzig',
 		restriction: (user) => isAdmin(user),
 	},
 	NEWEXPERIENCE: {
@@ -62,7 +62,7 @@ const pages = {
 	EDITEXPERIENCE: {
 		component: Admin,
 		title: 'Wijzig ervaring',
-		path: '/beheer/ervaring/:item',
+		path: '/beheer/ervaring/wijzig',
 		restriction: (user) => isAdmin(user),
 	},
 	NOTFOUND: {

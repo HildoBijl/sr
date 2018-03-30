@@ -1,0 +1,61 @@
+@import '../../shared/params.less';
+
+.newsOverview {
+	align-items: stretch;
+	display: flex;
+	flex-flow: column nowrap;
+
+	.item {
+		margin-bottom: 20px;
+
+		@media @phonePortrait {
+			display: flex;
+			flex-flow: column nowrap;
+
+			.title {
+				margin-top: 0;
+				order: 1;
+			}
+			p.edit {
+				order: 2;
+			}
+			img {
+				margin: 0px;
+				order: 3;
+				width: 100%;
+			}
+			p {
+				order: 4;
+			}
+		}
+
+		@media @landscape {
+
+			title {
+				margin-top: 0;
+			}
+			img {
+				float: right;
+				margin: 0 0 8px 16px;
+			}
+		}
+
+		@media @phoneLandscape {
+			img {
+				max-height: 200px;
+				max-width: 240px;
+			}
+		}
+		@media @desktop {
+			img {
+				max-height: 300px;
+				max-width: 480px;
+			}
+		}
+
+		p.edit {
+			font-size: 0.75em;
+			margin-top: -0.75em;
+		}
+	}
+}

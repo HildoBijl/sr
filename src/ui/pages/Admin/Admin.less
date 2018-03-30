@@ -10,7 +10,10 @@
 		.btn {
 			flex-grow: 1;
 			margin: 6px 8px;
-			max-width: 280px;
+
+			@media @landscape {
+				max-width: 280px;
+			}
 		}
 	}
 }
