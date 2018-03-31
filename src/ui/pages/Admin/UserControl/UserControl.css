@@ -26,12 +26,19 @@
   margin-top: 20px;
 }
 .userControl .users .user {
+  align-items: center;
   border-color: #33a7db;
   border-style: solid;
   border-width: 1px 1px 0;
   display: flex;
   flex-flow: row nowrap;
   padding: 4px;
+  min-height: 24px;
+}
+@media (min-width: 960.01px) {
+  .userControl .users .user {
+    min-height: 28px;
+  }
 }
 .userControl .users .user:last-child {
   border-width: 1px 1px;
@@ -69,4 +76,7 @@
   .userControl .users .user .field.role {
     width: 100px;
   }
+}
+.userControl .users .user .promote {
+  padding: 0 6px;
 }

@@ -13,12 +13,18 @@
 		margin-top: 20px;
 
 		.user {
+			align-items: center;
 			border-color: white - 0.8*(white - @mainColor);
 			border-style: solid;
 			border-width: 1px 1px 0;
 			display: flex;
 			flex-flow: row nowrap;
 			padding: 4px;
+
+			min-height: 24px;
+			@media @desktop {
+				min-height: 28px;
+			}
 
 			&:last-child {
 				border-width: 1px 1px;
@@ -52,6 +58,10 @@
 						width: 100px;
 					}
 				}
+			}
+
+			.promote {
+				padding: 0 6px;
 			}
 		}
 	}

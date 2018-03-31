@@ -115,7 +115,7 @@ class Account extends Component {
           </div>
           <img className={classnames('picture', {visible: settings.showPicture})} src={user.picture} alt="Profielfoto" />
         </div>
-        <p>De afbeelding hebben we van Google/Facebook doorgekregen toen je inlogde.</p>
+        <p>Je afbeelding (rechts) hebben we van Google/Facebook doorgekregen toen je inlogde.</p>
       </div>
     )
   }
