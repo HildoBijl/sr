@@ -36,7 +36,7 @@
     order: 2;
   }
   .newsOverview .item img {
-    margin: 0px;
+    margin: 6px 0px 12px;
     order: 3;
     width: 100%;
   }

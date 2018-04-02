@@ -104,7 +104,7 @@ const actions = {
 			checkUserData()(dispatch, getState) // Verify that the data in the datastore is valid. Update it if not.
 		}
 	),
-	processRedirectSuccess: (result) => ({
+	processRedirectSuccess: (result) =>  ({
 		type: 'RedirectSuccess',
 		result,
 	}),
@@ -120,7 +120,7 @@ const actions = {
 		(dispatch, getState) => {
 			// First call firebase to resign. We assume the command will make it, so we won't wait for confirmation. This is to increase the responsiveness of the website.
 			const user = getState().user
-			firebase.database().ref(`private/users/${user.uid}`).update({role: 'user'}).then(() => dispatch(setRole('user')))
+			firebase.database().ref(`private/users/${user.uid}`).update({ role: 'user' }).then(() => dispatch(setRole('user')))
 		}
 	),
 }
@@ -143,7 +143,7 @@ function getDefaultDBUser(user) {
 		email: user.email,
 		picture: user.picture,
 		role: 'user',
-		settings: {...defaultSettings}
+		settings: { ...defaultSettings }
 	}
 }
 function getPublicUser(privateUser) {

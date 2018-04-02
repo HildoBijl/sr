@@ -40,7 +40,7 @@ class Account extends Component {
     // We do not force an update when the object already dismounted. It is pointless, and React would throw an error too.
     clearTimeout(this.notificationTimeout)
   }
-
+  
   render() {
     const user = this.props.user
     if (!this.props.online)
@@ -67,7 +67,7 @@ class Account extends Component {
         </div>
       </div>
     )
-  } dddd
+  }
   renderSignInPage() {
     return (
       <div className="account">

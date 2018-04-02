@@ -1,10 +1,41 @@
+@import '../../shared/params.less';
+
 .about {
+	.gebied {
+		margin: 16px auto;
+		width: 200px;
+
+		@media @landscape {
+			float: right;
+			margin: 0 0 8px 16px;
+			width: 210px;
+		}
+		@media @desktop {
+			margin: 0 0 8px 24px;
+			width: 300px;
+		}
+
+		&.top {
+			display: none;
+			@media @landscape {
+				display: block;
+			}
+		}
+		&.middle {
+			display: block;
+			@media @landscape {
+				display: none;
+			}
+		}
+	}
+
 	ol {
 		list-style: decimal inside;
 	}
 
 	li {
-		margin-bottom: 6px;
+		line-height: @lineHeight;
+		margin-bottom: 2px;
 		margin-left: 4px;
 	}
 }
