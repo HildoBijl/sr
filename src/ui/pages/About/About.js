@@ -38,14 +38,17 @@ class About extends Component {
 				<h3>Contact</h3>
 				<p>Je kunt de Stille Rapers het beste via de mail bereiken, via {getMailLink()}.</p>
 
-				{/* TODO */}
-				{/* <h3>Soortgelijke projecten</h3>
+				<h3>Soortgelijke projecten</h3>
 				<p>Er zijn verschillende andere partijen die, net als de Stille Rapers, in actie komen tegen zwerfvuil.</p>
 				<ul>
-					<li>Persoon 1</li>
-					<li>Groep 2</li>
-					<li>Organisatie 3</li>
-				</ul> */}
+					<li>De Zaanse Schonen is een groep wandelaars (vooral omgeving Krommenie) die zich elke week verzamelt om hun omgeving schoon te houden. Je kunt ze vinden via hun <a href="https://www.facebook.com/ZaanseSchonen/" target="_blank" rel="noopener noreferrer">Facebook pagina</a>.</li>
+					<li>Ook in de Beemster kun je als groep wandelen en tegelijkertijd zwerfvuil opruimen. Voor meer informatie kun je mailen naar <a href="mailto: beemsterwandelingen@gmail.com" rel="noopener noreferrer">beemsterwandelingen@gmail.com</a>.</li>
+					<li>Bij <a href="http://www.elkombi.nl/" target="_blank" rel="noopener noreferrer">El Kombi</a>, een initiatief van Nanda van den Ham uit Alkmaar, kun je als groep gezellig Suppen (staand op een surfboard) terwijl je de troep opruimt uit het water.</li>
+					<li>De <a href="http://www.zwerfinator.nl/" target="_blank" rel="noopener noreferrer">Zwerfinator</a> (Dirk Groot uit Purmerend) bestrijdt zwerfafval en plastic soep door zelf te rapen en lol te maken, maar ook door gastlessen, workshops, teambuilding en als spreker.</li>
+					<li>Ook <a href="http://www.nhnieuws.nl/nieuws/211741/Thea-uit-Zuidermeer-ruimt-in-haar-vrije-tijd-zwerfvuil-op" target="_blank" rel="noopener noreferrer">Thea de Weerd</a> uit Zuidermeer raapt regelmatig zwerfvuil op in haar omgeving.</li>
+					<li>Rinze de Vries is actief bij het ontwikkelen van <a href="https://www.veiligschoonvoldoende.nl/veilig-schoon-voldoende/hoe-voorkomen-we-dat-kleiner-plastic-in-zee-komt_42512/" target="_blank" rel="noopener noreferrer">technieken</a> om zwerfvuil uit onze waterwegen te halen voordat het via onze gemalen de zee in gaat.</li>
+					<li><a href="https://www.supportervanschoon.nl/" target="_blank" rel="noopener noreferrer">Supporter van Schoon</a> is het platform voor de nationale opschoondag.</li>
+				</ul>
 			</div>
 		)
 	}

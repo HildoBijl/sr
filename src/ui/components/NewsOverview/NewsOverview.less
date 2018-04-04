@@ -8,12 +8,15 @@
 	.item {
 		margin-bottom: 20px;
 
+		.title {
+			margin-top: 0;
+		}
+
 		@media @phonePortrait {
 			display: flex;
 			flex-flow: column nowrap;
 
 			.title {
-				margin-top: 0;
 				order: 1;
 			}
 			p.edit {
@@ -30,9 +33,6 @@
 		}
 
 		@media @landscape {
-			title {
-				margin-top: 0;
-			}
 			img {
 				float: right;
 				margin: 0 0 8px 16px;

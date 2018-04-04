@@ -94,7 +94,7 @@ class Account extends Component {
           </div>
           <div className="btn" onClick={this.props.signOut}>Log uit</div>
         </div>
-        <p className="explanation">Je kunt op de <Link to={{ type: 'MAP' }}>interactieve kaart</Link> markeren in welke gebieden jij actief bent als raper. Zo kun je aan anderen laten zien dat ze niet alleen bezig zijn. Hierbij laten we de volgende informatie van je zien.</p>
+        <p className="explanation">Je kunt op de <Link to={{ type: 'MAP' }}>interactieve kaart</Link> markeren in welke gebieden jij actief bent als Stille Raper. Zo kun je aan anderen laten zien dat ze niet alleen bezig zijn. Hierbij laten we de volgende informatie van je zien.</p>
         <div className="settings">
           <div className="checkboxes">
             <Checkbox
