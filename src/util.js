@@ -3,7 +3,7 @@
 import React from 'react'
 
 export function getMailLink() {
-	const mail = 'stillerapers@gmail.com'
+	const mail = 'info@stillerapers.nl'
 	return <a href={`mailto: ${mail}`}>{mail}</a>
 }
 
