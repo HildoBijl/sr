@@ -15,3 +15,7 @@ export function stringCompare(A, B) {
 		return 1
 	return 0
 }
+
+export function rad2deg(v) {
+	return v * Math.PI / 180
+}

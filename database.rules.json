@@ -11,6 +11,24 @@
       "picture": {
         ".validate": "newData.isString()"
       },
+      "areas": {
+        "$key1": {
+          "$key2": {
+            ".validate": "newData.hasChildren() && newData.hasChildren(['lat', 'lng'])",
+            "lat": {
+              ".validate": "newData.isNumber()"
+            },
+            "lng": {
+              ".validate": "newData.isNumber()"
+            },
+            "$other": {
+              ".validate": "false"
+            }
+          },
+          ".validate": "newData.hasChildren()"
+        },
+        ".validate": "newData.hasChildren()"
+      },
       "$other": {
         ".validate": "false"
       },
@@ -26,6 +44,24 @@
           },
           "picture": {
             ".validate": "newData.isString()"
+          },
+          "areas": {
+            "$key1": {
+              "$key2": {
+                ".validate": "newData.hasChildren() && newData.hasChildren(['lat', 'lng'])",
+                "lat": {
+                  ".validate": "newData.isNumber()"
+                },
+                "lng": {
+                  ".validate": "newData.isNumber()"
+                },
+                "$other": {
+                  ".validate": "false"
+                }
+              },
+              ".validate": "newData.hasChildren()"
+            },
+            ".validate": "newData.hasChildren()"
           },
           "$other": {
             ".validate": "false"
@@ -55,7 +91,11 @@
           ".indexOn": [
             "date"
           ]
-        }
+        },
+        ".validate": "true",
+        ".indexOn": [
+          "date"
+        ]
       },
       "experiences": {
         "$id": {
@@ -79,7 +119,11 @@
           ".indexOn": [
             "date"
           ]
-        }
+        },
+        ".validate": "true",
+        ".indexOn": [
+          "date"
+        ]
       }
     },
     "private": {

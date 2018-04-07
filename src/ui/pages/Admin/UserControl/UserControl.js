@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import firebase from '../../../../config/firebase.js'
 import { stringCompare } from '../../../../util.js'
 import userActions, { isAdmin } from '../../../../redux/user.js'
+import userDataActions from '../../../../redux/userData.js'
 
 class UserControl extends Component {
 	state = {
@@ -20,38 +21,30 @@ class UserControl extends Component {
 
 	componentDidMount() {
 		this.mounted = true // We note that the object is mounted. This is so we can check if SetState is allowed.
-		if (this.state.usersLoaded === -1) {
-			firebase.database().ref('public/users').once('value').then((snapshot) => {
-				// Get an array of all uids.
-				this.users = snapshot.val()
-				this.uidArray = []
-				for (var uid in this.users) {
-					this.uidArray.push(uid)
-				}
-
-				// Extract the private data for all uids.
-				this.uidArray.forEach(uid => {
-					this.users[uid].loading = true
-					this.users[uid].uid = uid
-					firebase.database().ref(`private/users/${uid}`).once('value').then((snapshot) => {
-						this.users[uid] = snapshot.val()
-						this.users[uid].uid = uid
-						if (this.mounted) {
-							this.setState({
-								usersLoaded: this.state.usersLoaded + 1,
-							})
-						}
-					})
-				})
-
-				// Note that we at least know which users there are. We just haven't loaded their data yet.
-				this.setState({ usersLoaded: 0 })
-			})
-		}
+		this.props.loadUserData()
 	}
-
 	componentWillUnmount() {
 		this.mounted = false
+	}
+
+	componentDidUpdate() {
+		if (this.props.userData.known && !this.users) {
+			this.users = {}
+			Object.keys(this.props.userData.users).forEach(uid => {
+				this.users[uid] = {
+					...this.props.userData.users[uid],
+					loading: true,
+				}
+				firebase.database().ref(`private/users/${uid}`).once('value').then((snapshot) => {
+					this.users[uid] = snapshot.val()
+					this.users[uid].uid = uid
+					if (this.mounted)
+						this.setState({	usersLoaded: this.state.usersLoaded + 1 }) // Needed for a rerender.
+				})
+			})
+
+			this.setState({ usersLoaded: 0 }) // Needed for a rerender.
+		}
 	}
 
 	promoteUser(user) {
@@ -71,15 +64,12 @@ class UserControl extends Component {
 
 	render() {
 		// Check if we have user data loaded.
-		if (!this.state.usersLoaded === -1)
+		if (!this.props.userData.known)
 			return <div className="userControl loading"><p>Laden van gebruikers...</p></div>
 
 		// Turn the user data into an array of DOM elements.
-		const users = []
-		for (var uid in this.users) {
-			users.push(this.users[uid])
-		}
-		const rows = users.sort((a, b) => stringCompare(a.name, b.name)).map(user => this.renderUserEntry(user))
+		const users = Object.keys(this.props.userData.users).map(this.getUserData.bind(this)).sort((a, b) => stringCompare(a.name, b.name))
+		const rows = users.map(user => this.renderUserEntry(user))
 
 		// Return the result.
 		return (
@@ -95,12 +85,12 @@ class UserControl extends Component {
 		return (
 			<div className="resignButton">
 				<p>Je bent beheerder van deze website. Dat betekent dat je nieuwe ervaringen en nieuwsberichten kunt toevoegen, via het menu hierboven.</p>
-				<p>Mocht je geen beheerder meer willen zijn, dan kun je <span className="btn resign" onClick={this.verifyResignation}>ontslag nemen</span>. Je zegt je beheerdersrechten hiermee dan op.</p>
+				<p>Mocht je geen beheerder meer willen zijn, dan kun je <span className="btn inline" onClick={this.verifyResignation}>ontslag nemen</span>. Je zegt je beheerdersrechten hiermee dan op.</p>
 			</div>
 		)
 	}
 	renderUserEntry(user) {
-		if (user.loading)
+		if (this.isLoadingUser(user.uid))
 			return <div key={user.uid} className="user">Laden van data voor {user.name || '[anonieme gebruiker]'}...</div>
 		return (
 			<div key={user.uid} className="user">
@@ -110,12 +100,20 @@ class UserControl extends Component {
 			</div>
 		)
 	}
+	isLoadingUser(uid) {
+		return !this.users || !this.users[uid]
+	}
+	getUserData(uid) {
+		return (this.users && this.users[uid]) || (this.props.userData.known && this.props.userData.users[uid]) || null
+	}
 }
 
 const stateMap = (state) => ({
 	user: state.user,
+	userData: state.userData,
 })
 const actionMap = (dispatch) => ({
 	resign: () => dispatch(userActions.resign()),
+	loadUserData: () => dispatch(userDataActions.loadData())
 })
 export default connect(stateMap, actionMap)(UserControl)

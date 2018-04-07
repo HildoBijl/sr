@@ -32,7 +32,7 @@ const pages = {
 	},
 	ACCOUNT: {
 		component: Account,
-		title: (payload, user) => (isSignedIn(user) ? 'Instellingen' : 'Log in'), // TODO: TURN THIS INTO A FUNCTION THAT CHECKS IF THE USER IS LOGGED IN.
+		title: (payload, user) => (isSignedIn(user) ? 'Instellingen' : 'Log in'),
 		path: '/account',
 	},
 	ADMIN: {

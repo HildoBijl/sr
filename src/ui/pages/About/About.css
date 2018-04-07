@@ -48,14 +48,3 @@
     display: none;
   }
 }
-.about ol {
-  list-style: decimal outside;
-}
-.about ul {
-  list-style: disc outside;
-}
-.about li {
-  line-height: 1.42857143;
-  margin-bottom: 2px;
-  margin-left: 24px;
-}

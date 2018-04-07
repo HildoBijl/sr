@@ -85,6 +85,10 @@ p {
   user-select: none;
   vertical-align: middle;
 }
+.btn.inline {
+  padding: 0 6px;
+  vertical-align: top;
+}
 .btn:hover,
 .btn.active {
   background: #00aefc;
@@ -97,6 +101,39 @@ p {
   box-shadow: none;
   cursor: not-allowed;
   opacity: 0.65;
+}
+.buttonHolder {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  margin: 0 0 20px;
+}
+.buttonHolder .btn {
+  flex-grow: 1;
+  margin: 6px 8px;
+}
+@media (min-width: 480.01px) {
+  .buttonHolder .btn {
+    max-width: 280px;
+  }
+}
+ol {
+  list-style: decimal outside;
+}
+ul {
+  list-style: disc outside;
+  margin: 6px 0;
+}
+li {
+  line-height: 1.42857143;
+  margin-bottom: 2px;
+  margin-left: 24px;
+}
+ul ul {
+  list-style: circle outside;
+}
+ul ul li {
+  margin-left: 16px;
 }
 .success {
   color: #83e51b;

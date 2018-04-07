@@ -6,6 +6,13 @@ type Date extends String {
   validate() { return isISODate(this) }
 }
 
+type Coordinate {
+  lat: Number,
+  lng: Number,
+}
+
+type Area extends Coordinate[] {} // An area is a polygon (array) of coordinates.
+
 type Settings {
   showName: Boolean,
   showEmail: Boolean,
@@ -25,6 +32,7 @@ type PublicUser {
   name: String | Null,
   email: String | Null,
   picture: String | Null,
+  areas: Area[] | Null,
 }
 
 type Story {

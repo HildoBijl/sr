@@ -15,10 +15,6 @@
   user-select: none;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
-.userControl .resign {
-  padding: 0 6px;
-  vertical-align: top;
-}
 .userControl .users {
   align-items: stretch;
   display: flex;

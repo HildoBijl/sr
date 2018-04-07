@@ -45,7 +45,7 @@ class Admin extends Component {
 		const pageKey = this.props.location.type
 		return (
 			<div className="admin">
-				<div className="adminButtons">
+				<div className="buttonHolder">
 					{adminPages.map(page => (
 						page.showButton ? <div key={page.key} className={classnames('btn', { active: pageKey === page.key })} onClick={() => this.props.goToPage(page.key)}>{page.title}</div> : ''
 					))}
