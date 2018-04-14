@@ -6,11 +6,11 @@ import loadGoogleMapsAPI from 'load-google-maps-api'
 import Link from 'redux-first-router-link'
 import classnames from 'classnames'
 
-import firebase from '../../../config/firebase.js'
 import mapConfig from '../../../config/maps.json'
-import { getMailLink, rad2deg } from '../../../util.js'
+import { getMailLink, getDistance } from '../../../util.js'
 import { isSignedIn } from '../../../redux/user.js'
 import userDataActions from '../../../redux/userData.js'
+import mapActions from '../../../redux/map.js'
 
 const defaultLocation = { // This location is chosen to be right in the middle of our area. So if we focus the map on that and choose an appropriate scale, we should have the full area on-screen.
 	lat: 52.7437793,
@@ -24,7 +24,7 @@ const polygonStyle = {
 	fillOpacity: .5,
 	scale: 5,
 	strokeColor: '#000088',
-	strokeWeight: 2,
+	strokeWeight: 0,
 }
 
 class Map extends Component {
@@ -32,29 +32,16 @@ class Map extends Component {
 		super()
 		this.state = {
 			location: undefined, // What is the location of the user? undefined means unknown.
-			mouse: undefined, // What is the location of the mouse? undefined means the mouse is not on the map.
 			error: false, // Has an error occurred? If so, don't show a map.
-
-			// TODO: SET OWNAREAS TO FALSE.
-			ownAreas: true, // Are we editing areas? (That is, on the editing page for one's own areas.)
-			action: 'none', // What are we doing? Are we doing nothing ("none"), are we "adding" or are we "editing"?
-			currentPolygon: [], // The currently active polygon, what coordinates does it consist of?
 		}
+
+		// This object will keep track of all the polygons displayed on the map.
+		this.userPolygons = {}
 
 		// Bind event handlers to this class.
 		this.processMapMouseMove = this.processMapMouseMove.bind(this)
 		this.processMapMouseOut = this.processMapMouseOut.bind(this)
 		this.processMapClick = this.processMapClick.bind(this)
-	}
-
-	setLocation(position) {
-		// Save the position that we received from the navigator geolocation. The update will automatically apply the new position.
-		this.setState({
-			location: {
-				lat: position.coords.latitude,
-				lng: position.coords.longitude,
-			},
-		})
 	}
 
 	componentDidMount() {
@@ -78,6 +65,7 @@ class Map extends Component {
 			}).then(() => {
 				this.updateMap()
 			}).catch((err) => {
+				console.error(err) // TODO REMOVE
 				this.setState({
 					error: true,
 				})
@@ -86,9 +74,18 @@ class Map extends Component {
 			this.updateMap()
 		}
 	}
-
 	componentDidUpdate(oldProps) {
 		this.updateMap(oldProps)
+	}
+
+	// Save the position that we received from the navigator geolocation. By doing this, the map will automatically center on this point.
+	setLocation(position) {
+		this.setState({
+			location: {
+				lat: position.coords.latitude,
+				lng: position.coords.longitude,
+			},
+		})
 	}
 
 	initializeMap() {
@@ -102,23 +99,6 @@ class Map extends Component {
 		}
 		this.map = new GM.Map(this.mapObj, options)
 		this.addMapEventListeners(this.map) // Listen to all required events.
-
-		// TODO: REMOVE MARKER?
-		// Set up a marker that is used for following the mouse when required. At the start, make it invisible.
-		this.marker = new GM.Marker({
-			position: this.getUserLocation(),
-			icon: {
-				path: GM.SymbolPath.CIRCLE,
-				fillColor: '#0000cc',
-				fillOpacity: .5,
-				scale: 5,
-				strokeColor: '#000088',
-				strokeWeight: 2,
-			},
-			map: this.map,
-			visible: false,
-		})
-		this.addMapEventListeners(this.marker) // This object should also process mouse events.
 
 		// Set up a polygon to display for active events.
 		this.polygon = new GM.Polygon({
@@ -140,36 +120,30 @@ class Map extends Component {
 	}
 
 	processMapMouseMove(evt) {
-		this.setState({ mouse: { lat: evt.latLng.lat(), lng: evt.latLng.lng() } })
+		this.props.setMouseLocation({ lat: evt.latLng.lat(), lng: evt.latLng.lng() })
 	}
 	processMapMouseOut(evt) {
-		this.setState({ mouse: undefined })
+		this.props.setMouseLocation(undefined)
 	}
 	processMapClick(evt) {
 		// Don't do anything when we're not involved in an action.
-		if (this.state.action === 'none')
+		if (this.props.map.action === 'none')
 			return
 
 		// Check if we are close to the last point of the polygon. If so, remove the last point of the polygon.
 		const location = { lat: evt.latLng.lat(), lng: evt.latLng.lng() }
-		if (this.areLocationsClose(location, this.state.currentPolygon[this.state.currentPolygon.length - 1])) {
-			return this.setState({ currentPolygon: this.state.currentPolygon.slice(0, -1) })
+		this.props.setMouseLocation(location)
+		if (this.areLocationsClose(location, this.props.map.currentPolygon[this.props.map.currentPolygon.length - 1])) {
+			return this.props.removePolygonLocation(this.props.map.currentPolygon.length - 1)
 		}
 
 		// Check if we are close to the first point of the polygon. If so, close (confirm) the polygon.
-		if (this.areLocationsClose(location, this.state.currentPolygon[0])) {
-			return this.confirmCurrentPolygon()
+		if (this.areLocationsClose(location, this.props.map.currentPolygon[0])) {
+			return this.props.confirmPolygon()
 		}
 
 		// Add the current location to the currently active polygon.
-		this.addLocationToCurrentPolygon(location)
-	}
-
-	addLocationToCurrentPolygon(location) {
-		const currentPolygon = this.state.currentPolygon.slice(0)
-		currentPolygon.push(location)
-		this.setState({ currentPolygon })
-		console.log(JSON.stringify(currentPolygon))
+		this.props.addPolygonLocation(location)
 	}
 
 	setMarkersToLocations(locations) {
@@ -211,97 +185,92 @@ class Map extends Component {
 		if (!this.map)
 			this.initializeMap()
 
-		// Adjust the position if we just obtained it.
+		// If we just obtained the user's location, adjust the map location and zoom level.
 		if (!oldProps || (!oldProps.location && this.props.location)) {
 			this.map.setCenter(this.getUserLocation())
 			this.map.setZoom(this.getDesiredZoom())
 		}
 
-		// Update the polygons if we just obtained the user data.
-		if ((!oldProps || !oldProps.userData.known) && this.props.userData.known) {
-			// Walk through the users and then through the polygons.
-			this.userPolygons = {}
-			Object.keys(this.props.userData.users).forEach(uid => {
-				// Walk through the user areas and display them.
-				const user = this.props.userData.users[uid]
-				if (user.areas)
-					Object.keys(user.areas).forEach(aid => this.displayArea(user.areas[aid], aid, uid))
-			})
-		}
+		// Determine if we should update all polygons.
+		let update = 'none'
+		if (!oldProps)
+			update = 'all'
+		else if (!oldProps.userData.known && this.props.userData.known)
+			update = 'all' // Update if we just obtained user data.
+		else if (oldProps.map.page !== this.props.map.page)
+			update = 'all' // Update if we switched page.
+		else if (oldProps.map.action !== this.props.map.action)
+			update = 'own'
+
+		// Update the respective polygons.
+		if (update === 'all')
+			this.updateAllPolygons()
+		else if (update === 'own')
+			this.updateUserPolygons(this.props.user.uid)
 
 		// Update the polygon, if needed.
-		if (this.state.action === 'adding') {
-			const polygon = this.state.currentPolygon.slice(0)
-			if (this.state.mouse && !this.isMouseCloseTo(polygon[0]) && !this.isMouseCloseTo(polygon[polygon.length - 1]))
-				polygon.push(this.state.mouse)
+		if (this.props.map.action === 'adding') {
+			const polygon = this.props.map.currentPolygon.slice(0)
+			if (this.props.map.mouse && !this.isMouseCloseTo(polygon[0]) && !this.isMouseCloseTo(polygon[polygon.length - 1]))
+				polygon.push(this.props.map.mouse)
 			this.polygon.setPaths(polygon)
 			this.setMarkersToLocations(polygon)
 		}
 	}
 
-	displayArea(area, aid, uid) {
+	updateAllPolygons() {
+		// Don't do anything without user data known.
+		if (!this.props.userData.known)
+			return
+
+		// Walk through the users and update their polygons.
+		Object.keys(this.props.userData.users).forEach(uid => this.updateUserPolygons(uid))
+	}
+
+	updateUserPolygons(uid) {
+		// Walk through the user areas and update them.
+		const user = this.props.userData.users[uid]
+		if (user.areas)
+			Object.keys(user.areas).forEach(aid => this.updatePolygon(user.areas[aid], aid, uid))
+	}
+
+	updatePolygon(area, aid, uid) {
 		// If the user does not have an array for his polygons yet, create one.
 		if (!this.userPolygons[uid])
 			this.userPolygons[uid] = {}
 
-		// Set up a polygon for the given area.
-		const polygon = new window.google.maps.Polygon({
-			...polygonStyle,
-			paths: area,
-			map: this.map,
+		// If this area does not have its own polygon yet, create it.
+		let polygon = this.userPolygons[uid][aid]
+		if (!polygon) {
+			polygon = new window.google.maps.Polygon({
+				...polygonStyle,
+				paths: area,
+				map: this.map,
+			})
+			this.userPolygons[uid][aid] = polygon // Remember the polygon.
+			this.addMapEventListeners(polygon) // The polygon should also process mouse events.
+		}
+
+		// Make sure that the polygon has the right properties.
+		polygon.setVisible(this.props.map.page === 'fullMap' || uid === this.props.user.uid)
+		polygon.setOptions({
+			fillOpacity: this.props.map.action === 'none' ? 0.7 : 0.3,
 		})
-		this.addMapEventListeners(this.polygon) // This object should also process mouse events.
-		
-		// Remember the given polygon.
-		this.userPolygons[uid][aid] = polygon
 	}
 
 	isMouseCloseTo(location) {
-		return this.areLocationsClose(location, this.state.mouse)
+		return this.areLocationsClose(location, this.props.map.mouse)
 	}
-
 	areLocationsClose(a, b) {
 		// Verify that we have two locations to compare.
 		if (!a || !b)
 			return false
 		
 		// Check the normalized distance, taking into account the map zoom.
-		const distance = this.getDistance(a, b)
+		const distance = getDistance(a, b)
 		const scale = 1183315101 / Math.pow(2, this.map.getZoom())
 		const normalizedDistance = distance / scale
 		return normalizedDistance < 0.001
-	}
-
-	getDistance(a, b) {
-		// Apply the Haversine formula to get the distance between two points, with latitude and longitude known.
-		const dLat = rad2deg(b.lat - a.lat)
-		const dLng = rad2deg(b.lng - a.lng)
-		const c = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(rad2deg(a.lat)) * Math.cos(rad2deg(b.lat)) * Math.sin(dLng / 2) * Math.sin(dLng / 2)
-		return 6378137 * 2 * Math.atan2(Math.sqrt(c), Math.sqrt(1 - c)) // Multiply by Earth's radius too.
-	}
-	confirmCurrentPolygon() {
-		// Verify that the polygon is valid.
-		console.log('Confirming!')
-		const polygon = this.state.currentPolygon
-		if (this.isValidPolygon(polygon)) {
-			firebase.database().ref(`public/users/${this.props.user.uid}/areas`).push(polygon)
-			// TODO: ADD TO LOCAL STORAGE.
-		}
-		this.cancelCurrentPolygon()
-		// Store polygon, also to internal data.
-	}
-	cancelCurrentPolygon() {
-		console.log('Getting rid of polygon.')
-		this.setState({
-			action: 'none',
-			currentPolygon: [],
-		})
-	}
-
-	isValidPolygon(polygon) {
-		if (polygon.length <= 2)
-			return false
-		return true
 	}
 
 	render() {
@@ -319,7 +288,7 @@ class Map extends Component {
 				</div>
 			)
 		}
-		if (!this.state.ownAreas) { // Signed in and not editing; on the overview.
+		if (this.props.map.page === 'fullMap') { // Signed in and not editing; on the overview.
 			return (
 				<div className="map">
 					{this.renderControlButtons()}
@@ -328,7 +297,7 @@ class Map extends Component {
 				</div>
 			)
 		}
-		return ( // Signed in and editing.
+		return ( // Signed in and editing. This is the case when `this.props.map.page === 'ownAreas'.
 			<div className="map">
 				{this.renderControlButtons()}
 				<p>Je kunt hier zelf aangeven waar jij regelmatig (minimaal enkele keren per jaar) zwerfvuil aan het rapen bent.</p>
@@ -359,8 +328,8 @@ class Map extends Component {
 	renderControlButtons() {
 		return (
 			<div className="buttonHolder">
-				<div className={classnames('btn', { active: !this.state.ownAreas })} onClick={() => this.setState({ ownAreas: false })}>De kaart voor iedereen</div>
-				<div className={classnames('btn', { active: this.state.ownAreas })} onClick={() => this.setState({ ownAreas: true })}>Mijn gebieden wijzigen</div>
+				<div className={classnames('btn', { active: this.props.map.page === 'fullMap' })} onClick={() => this.props.setMapPage('fullMap')}>De kaart voor iedereen</div>
+				<div className={classnames('btn', { active: this.props.map.page === 'ownAreas' })} onClick={() => this.props.setMapPage('ownAreas')}>Mijn gebieden wijzigen</div>
 			</div>
 		)
 	}
@@ -368,29 +337,28 @@ class Map extends Component {
 		return <p>Op de onderstaande kaart kun je zien waar er geraapt wordt. Klik op een gekleurd vlak om te zien wie in dat gebied actief is.</p>
 	}
 	renderEditingButtons() {
-		if (this.state.action === 'none') {
+		if (this.props.map.action === 'none') {
 			return (
 				<div className="buttonHolder">
-					<div className="btn" onClick={() => this.setState({ action: 'adding' })}>Voeg een nieuw gebied toe</div>
+					<div className="btn" onClick={() => this.props.setMapAction('adding')}>Voeg een nieuw gebied toe</div>
 				</div>
 			)
 		}
-		if (this.state.action === 'adding') {
-			// TODO: Add functions to process the added area.
+		if (this.props.map.action === 'adding') {
 			return (
 				<div className="buttonHolder">
-					<div className="btn" onClick={this.confirmCurrentPolygon.bind(this)}>Bevestig gebied</div>
-					<div className="btn" onClick={this.cancelCurrentPolygon.bind(this)}>Annuleer gebied</div>
+					<div className="btn" onClick={this.props.confirmPolygon}>Bevestig gebied</div>
+					<div className="btn" onClick={this.props.cancelPolygon}>Annuleer gebied</div>
 				</div>
 			)
 		}
-		if (this.state.action === 'editing') {
+		if (this.props.map.action === 'editing') {
 			// TODO: Add functions to process the edited area.
 			return (
 				<div className="buttonHolder">
-					<div className="btn" onClick={() => this.setState({ action: 'none' })}>Bevestig wijzigingen</div>
-					<div className="btn" onClick={() => this.setState({ action: 'none' })}>Annuleer wijzigingen</div>
-					<div className="btn" onClick={() => this.setState({ action: 'none' })}>Verwijder gebied</div>
+					<div className="btn" onClick={() => this.props.setMapAction('none')}>Bevestig wijzigingen</div>
+					<div className="btn" onClick={() => this.props.setMapAction('none')}>Annuleer wijzigingen</div>
+					<div className="btn" onClick={() => this.props.setMapAction('none')}>Verwijder gebied</div>
 				</div>
 			)
 		}
@@ -416,9 +384,17 @@ const stateMap = (state) => ({
 	location: state.location,
 	user: state.user,
 	userData: state.userData,
+	map: state.map,
 })
 const actionMap = (dispatch) => ({
 	goToPage: (page, payload) => dispatch({ type: page, payload }),
 	loadUserData: () => dispatch(userDataActions.loadData()),
+	setMapPage: (page) => dispatch(mapActions.setPage(page)),
+	setMapAction: (action) => dispatch(mapActions.setAction(action)),
+	setMouseLocation: (location) => dispatch(mapActions.setMouseLocation(location)),
+	addPolygonLocation: (location) => dispatch(mapActions.addPolygonLocation(location)),
+	removePolygonLocation: (locationIndex) => dispatch(mapActions.removePolygonLocation(locationIndex)),
+	confirmPolygon: () => dispatch(mapActions.confirmPolygon()),
+	cancelPolygon: () => dispatch(mapActions.cancelPolygon()),
 })
 export default connect(stateMap, actionMap)(Map)
