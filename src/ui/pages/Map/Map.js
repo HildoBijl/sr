@@ -19,13 +19,7 @@ const defaultLocation = { // This location is chosen to be right in the middle o
 const zoomWithoutPosition = 8 // The zoom we apply when we don't know where the user is and use the default.
 const zoomOnPosition = 12 // The zoom we apply when we know where the user is.
 
-const polygonStyle = {
-	fillColor: '#0000cc',
-	fillOpacity: .5,
-	scale: 5,
-	strokeColor: '#000088',
-	strokeWeight: 0,
-}
+let GM // This will be the Google maps interface.
 
 class Map extends Component {
 	constructor() {
@@ -35,13 +29,14 @@ class Map extends Component {
 			error: false, // Has an error occurred? If so, don't show a map.
 		}
 
-		// This object will keep track of all the polygons displayed on the map.
-		this.userPolygons = {}
+		// This object will keep track of all the polygons displayed on the map as well as all the markers. Polygons are tracked per user. Markers are just tracked as markers.
+		this.markers = [] // TODO: PLACE THIS SOMEWHERE ELSE
 
 		// Bind event handlers to this class.
 		this.processMapMouseMove = this.processMapMouseMove.bind(this)
 		this.processMapMouseOut = this.processMapMouseOut.bind(this)
 		this.processMapClick = this.processMapClick.bind(this)
+		this.polygonStyle = this.polygonStyle.bind(this)
 	}
 
 	componentDidMount() {
@@ -62,7 +57,8 @@ class Map extends Component {
 		if (!window.google || !window.google.maps) {
 			loadGoogleMapsAPI({
 				key: mapConfig.browserKey,
-			}).then(() => {
+			}).then((result) => {
+				GM = result
 				this.updateMap()
 			}).catch((err) => {
 				console.error(err) // TODO REMOVE
@@ -71,6 +67,7 @@ class Map extends Component {
 				})
 			})
 		} else {
+			GM = window.google.maps
 			this.updateMap()
 		}
 	}
@@ -99,18 +96,17 @@ class Map extends Component {
 		}
 		this.map = new GM.Map(this.mapObj, options)
 		this.addMapEventListeners(this.map) // Listen to all required events.
+		this.addMapEventListeners(this.map.data) // Listen to all required events.
 
-		// Set up a polygon to display for active events.
-		this.polygon = new GM.Polygon({
-			...polygonStyle,
-			paths: [],
-			map: this.map,
-			visible: false,
-		})
-		this.addMapEventListeners(this.polygon) // This object should also process mouse events.
-
-		// Set up an array of markers. We will fill it up as we go.
-		this.markers = []
+		// TODO: REMOVE THIS? OR USE IT FOR THE ACTIVE POLYGON.
+		// // Set up a polygon to display for active events.
+		// this.polygon = new GM.Polygon({
+		// 	...polygonStyle,
+		// 	paths: [],
+		// 	map: this.map,
+		// 	visible: false,
+		// })
+		// this.addMapEventListeners(this.polygon) // This object should also process mouse events.
 	}
 
 	addMapEventListeners(obj) {
@@ -148,7 +144,6 @@ class Map extends Component {
 
 	setMarkersToLocations(locations) {
 		// Add markers if necessary.
-		const GM = window.google.maps
 		while (this.markers.length < locations.length) {
 			const newMarker = new GM.Marker({
 				position: this.getUserLocation(),
@@ -178,7 +173,7 @@ class Map extends Component {
 
 	updateMap(oldProps) {
 		// If we don't have the Google Maps API loaded yet, do nothing.
-		if (!window.google || !window.google.maps)
+		if (!GM)
 			return
 
 		// If we haven't initialized the map yet, do so right away.
@@ -191,72 +186,137 @@ class Map extends Component {
 			this.map.setZoom(this.getDesiredZoom())
 		}
 
-		// Determine if we should update all polygons.
-		let update = 'none'
+		// If we received user data, initialize all polygons.
+		if ((!oldProps || !oldProps.userData.known) && this.props.userData.known)
+			this.initializePolygons()
+
+		// Determine if we should update the current polygon.
 		if (!oldProps)
-			update = 'all'
+			this.updateCurrentPolygon()
+		else if ((this.props.map.action === 'adding' || this.props.map.action !== oldProps.map.action) && (oldProps.map.currentPolygon !== this.props.map.currentPolygon || oldProps.map.mouse !== this.props.map.mouse))
+			this.updateCurrentPolygon()
+
+		// Determine if we should update all polygons.
+		if (!oldProps)
+			this.updatePolygonStyle() // Update if we just obtained our first data.
 		else if (!oldProps.userData.known && this.props.userData.known)
-			update = 'all' // Update if we just obtained user data.
+			this.updatePolygonStyle() // Update if we just obtained user data.
 		else if (oldProps.map.page !== this.props.map.page)
-			update = 'all' // Update if we switched page.
+			this.updatePolygonStyle() // Update if we switched page.
 		else if (oldProps.map.action !== this.props.map.action)
-			update = 'own'
-
-		// Update the respective polygons.
-		if (update === 'all')
-			this.updateAllPolygons()
-		else if (update === 'own')
-			this.updateUserPolygons(this.props.user.uid)
-
-		// Update the polygon, if needed.
-		if (this.props.map.action === 'adding') {
-			const polygon = this.props.map.currentPolygon.slice(0)
-			if (this.props.map.mouse && !this.isMouseCloseTo(polygon[0]) && !this.isMouseCloseTo(polygon[polygon.length - 1]))
-				polygon.push(this.props.map.mouse)
-			this.polygon.setPaths(polygon)
-			this.setMarkersToLocations(polygon)
-		}
+			this.updatePolygonStyle() // Update if we switched action.
 	}
 
-	updateAllPolygons() {
-		// Don't do anything without user data known.
-		if (!this.props.userData.known)
-			return
+	initializePolygons() {
+		// Walk through the users and initialize their polygons.
+		this.userPolygons = {} // This object will store all individual polygons.
+		Object.keys(this.props.userData.users).forEach(uid => this.initializeUserPolygons(uid))
 
-		// Walk through the users and update their polygons.
-		Object.keys(this.props.userData.users).forEach(uid => this.updateUserPolygons(uid))
+		// Initialize the polygon used when adding new Polygons (or editing current ones).
+		this.currentPolygon = this.map.data.add({
+			id: 'current',
+			properties: {
+				uid: this.props.user.uid,
+			},
+			geometry: new GM.Data.Polygon([]),
+		})
+
+		// Ensure that all polygons have the right style.
+		this.updatePolygonStyle()
+
+		// // TODO: ADD EVENT LISTENERS TO SHOW INFORMATION ABOUT WHO IS IN WHAT AREA.
+		// const userData = this.props.userData
+		// this.map.data.addListener('mouseover', function(event) {
+		// 	const uid = event.feature.getProperty('uid')
+		// 	console.log(uid)
+		// 	console.log(userData.users[uid].name)
+		// })
 	}
-
-	updateUserPolygons(uid) {
+	initializeUserPolygons(uid) {
 		// Walk through the user areas and update them.
 		const user = this.props.userData.users[uid]
-		if (user.areas)
-			Object.keys(user.areas).forEach(aid => this.updatePolygon(user.areas[aid], aid, uid))
+		this.userPolygons[uid] = {} // Create an object for the user polygons.
+		Object.keys(user.areas || {}).forEach(aid => this.initializePolygon(user.areas[aid], aid, uid))
 	}
-
-	updatePolygon(area, aid, uid) {
-		// If the user does not have an array for his polygons yet, create one.
-		if (!this.userPolygons[uid])
-			this.userPolygons[uid] = {}
-
-		// If this area does not have its own polygon yet, create it.
-		let polygon = this.userPolygons[uid][aid]
-		if (!polygon) {
-			polygon = new window.google.maps.Polygon({
-				...polygonStyle,
-				paths: area,
-				map: this.map,
-			})
-			this.userPolygons[uid][aid] = polygon // Remember the polygon.
-			this.addMapEventListeners(polygon) // The polygon should also process mouse events.
-		}
-
-		// Make sure that the polygon has the right properties.
-		polygon.setVisible(this.props.map.page === 'fullMap' || uid === this.props.user.uid)
-		polygon.setOptions({
-			fillOpacity: this.props.map.action === 'none' ? 0.7 : 0.3,
+	initializePolygon(area, aid, uid) {
+		this.userPolygons[uid][aid] = this.map.data.add({
+			id: aid,
+			properties: {
+				uid,
+			},
+			geometry: new GM.Data.Polygon([area]),
 		})
 	}
+	updatePolygonStyle() {
+		if (!this.map)
+			return
+
+		// Set the right style for all polygons.
+		this.map.data.setStyle(this.polygonStyle)
+	}
+	updateCurrentPolygon() {
+		// Don't do anything if we haven't initialized the current polygon yet.
+		if (!this.currentPolygon)
+			return
+
+		// Figure out which polygon to display.
+		const polygon = this.props.map.currentPolygon.slice(0)
+		if (this.props.map.mouse && !this.isMouseCloseTo(polygon[0]) && !this.isMouseCloseTo(polygon[polygon.length - 1]))
+			polygon.push(this.props.map.mouse)
+		this.setMarkersToLocations(polygon)
+		this.currentPolygon.setGeometry(new GM.Data.Polygon([polygon]))
+	}
+	polygonStyle(feature) {
+		// TODO: PROPERLY STYLE POLYGONS.
+		const isCurrentUser = feature.getProperty('uid') === this.props.user.uid
+		const visible = this.props.map.page === 'fullMap' || (this.props.map.page === 'ownAreas' && isCurrentUser)
+		const color = isCurrentUser ? '#0091d2' : 'green'
+		return {
+			fillColor: color,
+			fillOpacity: .5,
+			strokeColor: '#004969',
+			strokeWeight: 4,
+			strokeOpacity: 0.5,
+			visible: visible,
+		}
+	}
+
+	// updateAllPolygons() {
+	// 	// Don't do anything without user data known.
+	// 	if (!this.props.userData.known)
+	// 		return
+
+	// 	// Walk through the users and update their polygons.
+	// 	Object.keys(this.props.userData.users).forEach(uid => this.updateUserPolygons(uid))
+	// }
+	// updateUserPolygons(uid) {
+	// 	// Walk through the user areas and update them.
+	// 	const user = this.props.userData.users[uid]
+	// 	Object.keys(user.areas || {}).forEach(aid => this.updatePolygon(user.areas[aid], aid, uid))
+	// }
+	// updatePolygon(area, aid, uid) {
+	// 	// If the user does not have an array for his polygons yet, create one.
+	// 	if (!this.userPolygons[uid])
+	// 		this.userPolygons[uid] = {}
+
+	// 	// If this area does not have its own polygon yet, create it.
+	// 	let polygon = this.userPolygons[uid][aid]
+	// 	if (!polygon) {
+	// 		polygon = new GM.Polygon({
+	// 			...polygonStyle,
+	// 			paths: area,
+	// 			map: this.map,
+	// 		})
+	// 		this.userPolygons[uid][aid] = polygon // Remember the polygon.
+	// 		this.addMapEventListeners(polygon) // The polygon should also process mouse events.
+	// 	}
+
+	// 	// Make sure that the polygon has the right properties.
+	// 	polygon.setVisible(this.props.map.page === 'fullMap' || uid === this.props.user.uid)
+	// 	polygon.setOptions({
+	// 		fillOpacity: this.props.map.action === 'none' ? 0.7 : 0.3,
+	// 	})
+	// }
 
 	isMouseCloseTo(location) {
 		return this.areLocationsClose(location, this.props.map.mouse)
@@ -265,7 +325,7 @@ class Map extends Component {
 		// Verify that we have two locations to compare.
 		if (!a || !b)
 			return false
-		
+
 		// Check the normalized distance, taking into account the map zoom.
 		const distance = getDistance(a, b)
 		const scale = 1183315101 / Math.pow(2, this.map.getZoom())
