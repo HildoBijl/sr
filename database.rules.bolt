@@ -33,6 +33,7 @@ type PublicUser {
   email: String | Null,
   picture: String | Null,
   areas: Area[] | Null,
+  color: String,
 }
 
 type Story {
@@ -58,7 +59,7 @@ function isAdmin(auth) {
 
 // Define database security rules.
 
-path /public is PublicUser {
+path /public {
   read() { true }
 }
 path /public/users/{uid} is PublicUser {

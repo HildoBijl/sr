@@ -6,9 +6,11 @@ import classnames from 'classnames'
 import Link from 'redux-first-router-link'
 
 import Checkbox from '../../components/Checkbox/Checkbox.js'
+import Circle from '../../components/Circle/Circle.js'
 
 import userActions, { isSignedIn, isFirebaseReady } from '../../../redux/user.js'
 import settingsActions, { getSettings } from '../../../redux/settings.js'
+import colors, { colorToHex } from '../../colors.js'
 
 const hideNotificationAfter = 6000 // The number of milliseconds after which we hide the notification.
 
@@ -40,7 +42,7 @@ class Account extends Component {
     // We do not force an update when the object already dismounted. It is pointless, and React would throw an error too.
     clearTimeout(this.notificationTimeout)
   }
-  
+
   render() {
     const user = this.props.user
     if (!this.props.online)
@@ -94,7 +96,12 @@ class Account extends Component {
           </div>
           <div className="btn" onClick={this.props.signOut}>Log uit</div>
         </div>
-        <p className="explanation">Je kunt op de <Link to={{ type: 'MAP' }}>interactieve kaart</Link> markeren in welke gebieden jij actief bent als Stille Raper. Zo kun je aan anderen laten zien dat ze niet alleen bezig zijn. Hierbij laten we de volgende informatie van je zien.</p>
+        <p>Je kunt op de <Link to={{ type: 'MAP' }}>interactieve kaart</Link> markeren in welke gebieden jij actief bent als Stille Raper. Zo kun je aan anderen laten zien dat ze niet alleen bezig zijn.</p>
+        <p>Jouw gebieden op de kaart hebben de volgende kleur.</p>
+        <div className="colorSelection">
+          {colors.map((color, i) => <Circle key={i} color={color} active={colorToHex(color) === user.color} onClick={() => this.props.setColor(color)} />)}
+        </div>
+        <p>Ook laten we aan andere bezoekers de volgende informatie van je zien.</p>
         <div className="settings">
           <div className="checkboxes">
             <Checkbox
@@ -113,7 +120,7 @@ class Account extends Component {
               changeFunction={(newVal) => this.props.applySettings({ showEmail: newVal })}
             />
           </div>
-          <img className={classnames('picture', {visible: settings.showPicture})} src={user.picture} alt="Profielfoto" />
+          <img className={classnames('picture', { visible: settings.showPicture })} src={user.picture} alt="Profielfoto" />
         </div>
         <p>Je afbeelding (rechts) hebben we van Google/Facebook doorgekregen toen je inlogde.</p>
       </div>
@@ -130,6 +137,7 @@ const actionMap = (dispatch) => ({
   signInGoogle: (redirect) => dispatch(userActions.signInGoogle(redirect)),
   signInFacebook: (redirect) => dispatch(userActions.signInFacebook(redirect)),
   signOut: () => dispatch(userActions.signOut()),
+  setColor: (color) => dispatch(userActions.setColor(color)),
   applySettings: (newSettings) => dispatch(settingsActions.applySettings(newSettings)),
 })
 export default connect(stateMap, actionMap)(Account)

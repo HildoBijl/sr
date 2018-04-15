@@ -91,6 +91,11 @@
     display: block;
   }
 }
+.account .colorSelection {
+  display: flex;
+  flex-flow: row wrap;
+  margin: -5px -5px 12px;
+}
 .account .settings {
   align-items: center;
   display: flex;
@@ -99,9 +104,6 @@
 .account .settings .checkboxes {
   flex-grow: 1;
   flex-shrink: 1;
-}
-.account .settings .checkboxes .explanation {
-  margin-bottom: 16px;
 }
 .account .settings .picture {
   border-radius: 25%;

@@ -49,6 +49,18 @@ export function reducer(state = getDefaultState(), action) {
 			}
 		}
 
+		case 'ApplyColor': {
+			const users = { ...state.users } // Clone the users object.
+			users[action.uid] = { // Set up the new user object.
+				...users[action.uid],
+				color: action.color,
+			}
+			return {
+				...state,
+				users,
+			}
+		}
+
 		default: {
 			return state
 		}

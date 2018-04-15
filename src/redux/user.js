@@ -1,13 +1,19 @@
 import firebase from '../config/firebase.js'
 import settingActions, { defaultSettings } from './settings.js'
+import { colorToHex, getRandomColor } from '../ui/colors.js'
 
 /*
  * First, set up the actions changing things.
  */
 
-const setRole = (role) => ({
-	type: 'SetRole',
+const applyRole = (role) => ({
+	type: 'ApplyRole',
 	role,
+})
+const applyColor = (color, uid) => ({
+	type: 'ApplyColor',
+	color,
+	uid,
 })
 
 const checkUserData = () => (
@@ -52,7 +58,7 @@ const checkUserData = () => (
 
 			// Process the settings and role that were loaded from the database.
 			dispatch(settingActions.applySettings(privateUser.settings))
-			dispatch(setRole(privateUser.role))
+			dispatch(applyRole(privateUser.role))
 
 			// Check the public data of the user.
 			const publicRef = firebase.database().ref(`public/users/${user.uid}`)
@@ -79,9 +85,16 @@ const checkUserData = () => (
 						update.picture = desiredPublicUser.picture || null
 						change = true
 					}
+					if (!publicUser.color) {
+						update.color = colorToHex(getRandomColor())
+						change = true
+					}
 					if (change) {
 						publicRef.update(update)
 					}
+
+					// Remember the color for the user.
+					dispatch(applyColor(publicUser.color || update.color, user.uid))
 				}
 			})
 		})
@@ -104,7 +117,7 @@ const actions = {
 			checkUserData()(dispatch, getState) // Verify that the data in the datastore is valid. Update it if not.
 		}
 	),
-	processRedirectSuccess: (result) =>  ({
+	processRedirectSuccess: (result) => ({
 		type: 'RedirectSuccess',
 		result,
 	}),
@@ -115,12 +128,21 @@ const actions = {
 
 	// Actions for the database tracking of users.
 	checkUserData,
-	setRole,
+	applyRole,
 	resign: () => (
 		(dispatch, getState) => {
-			// First call firebase to resign. We assume the command will make it, so we won't wait for confirmation. This is to increase the responsiveness of the website.
-			const user = getState().user
-			firebase.database().ref(`private/users/${user.uid}`).update({ role: 'user' }).then(() => dispatch(setRole('user')))
+			// Call firebase to resign. Once the command has been received, we also reset the role of the user here.
+			firebase.database().ref(`private/users/${getState().user.uid}`).update({ role: 'user' }).then(() => dispatch(applyRole('user')))
+		}
+	),
+	applyColor,
+	setColor: (color) => (
+		(dispatch, getState) => {
+			// Call firebase to implement the color. We assume the command will make it, so we won't wait for confirmation before applying the color. This is to increase the responsiveness of the website.
+			const uid = getState().user.uid
+			const hexColor = colorToHex(color)
+			firebase.database().ref(`public/users/${uid}`).update({ color: hexColor })
+			dispatch(applyColor(hexColor, uid))
 		}
 	),
 }
@@ -154,6 +176,7 @@ function getPublicUser(privateUser) {
 		publicUser.email = privateUser.email
 	if (privateUser.settings.showPicture)
 		publicUser.picture = privateUser.picture
+	publicUser.color = getRandomColor()
 	return publicUser
 }
 
@@ -234,10 +257,17 @@ export function reducer(user = { ready: false }, action) {
 			}
 		}
 
-		case 'SetRole': {
+		case 'ApplyRole': {
 			return {
 				...user,
 				role: action.role,
+			}
+		}
+
+		case 'ApplyColor': {
+			return {
+				...user,
+				color: action.color,
 			}
 		}
 

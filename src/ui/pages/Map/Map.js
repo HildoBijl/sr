@@ -11,13 +11,14 @@ import { getMailLink, getDistance } from '../../../util.js'
 import { isSignedIn } from '../../../redux/user.js'
 import userDataActions from '../../../redux/userData.js'
 import mapActions from '../../../redux/map.js'
+import { colorToHex, hexToColor, getRandomColor, darken } from '../../../ui/colors.js'
 
 const defaultLocation = { // This location is chosen to be right in the middle of our area. So if we focus the map on that and choose an appropriate scale, we should have the full area on-screen.
 	lat: 52.7437793,
 	lng: 4.8326161,
 }
-const zoomWithoutPosition = 8 // The zoom we apply when we don't know where the user is and use the default.
-const zoomOnPosition = 12 // The zoom we apply when we know where the user is.
+const zoomWithoutPosition = 9 // The zoom we apply when we don't know where the user is and use the default.
+const zoomOnPosition = 13 // The zoom we apply when we know where the user is.
 
 let GM // This will be the Google maps interface.
 
@@ -71,8 +72,8 @@ class Map extends Component {
 			this.updateMap()
 		}
 	}
-	componentDidUpdate(oldProps) {
-		this.updateMap(oldProps)
+	componentDidUpdate(oldProps, oldState) {
+		this.updateMap(oldProps, oldState)
 	}
 
 	// Save the position that we received from the navigator geolocation. By doing this, the map will automatically center on this point.
@@ -171,7 +172,7 @@ class Map extends Component {
 		})
 	}
 
-	updateMap(oldProps) {
+	updateMap(oldProps, oldState) {
 		// If we don't have the Google Maps API loaded yet, do nothing.
 		if (!GM)
 			return
@@ -181,7 +182,7 @@ class Map extends Component {
 			this.initializeMap()
 
 		// If we just obtained the user's location, adjust the map location and zoom level.
-		if (!oldProps || (!oldProps.location && this.props.location)) {
+		if (!oldState || (!oldState.location && this.state.location)) {
 			this.map.setCenter(this.getUserLocation())
 			this.map.setZoom(this.getDesiredZoom())
 		}
@@ -268,13 +269,14 @@ class Map extends Component {
 	}
 	polygonStyle(feature) {
 		// TODO: PROPERLY STYLE POLYGONS.
-		const isCurrentUser = feature.getProperty('uid') === this.props.user.uid
+		const uid = feature.getProperty('uid')
+		const isCurrentUser = (uid === this.props.user.uid)
 		const visible = this.props.map.page === 'fullMap' || (this.props.map.page === 'ownAreas' && isCurrentUser)
-		const color = isCurrentUser ? '#0091d2' : 'green'
+		const color = hexToColor(this.props.userData.users[uid].color) || getRandomColor()
 		return {
-			fillColor: color,
+			fillColor: colorToHex(color),
 			fillOpacity: .5,
-			strokeColor: '#004969',
+			strokeColor: colorToHex(darken(color, 0.2)),
 			strokeWeight: 4,
 			strokeOpacity: 0.5,
 			visible: visible,
