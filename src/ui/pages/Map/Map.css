@@ -17,7 +17,7 @@
 }
 .map #googleMap {
   margin: 20px auto;
-  padding-bottom: 60%;
+  padding-bottom: 50%;
   position: relative;
   width: 100%;
 }

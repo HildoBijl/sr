@@ -39,30 +39,65 @@ export function reducer(state = getDefaultState(), action) {
 		case 'LoadedUserData': {
 			// Add the uid to each user, for easy reference.
 			const users = action.data
-			Object.keys(users).forEach(uid => {	users[uid].uid = uid })
+			Object.keys(users).forEach(uid => { users[uid].uid = uid })
 
 			// Set up the result object.
 			return {
 				ordered: true,
 				known: true,
 				users,
+				lastChange: {
+					type: 'LoadedData',
+				},
 			}
 		}
 
 		case 'ApplyColor': {
-			const users = { ...state.users } // Clone the users object.
-			users[action.uid] = { // Set up the new user object.
-				...users[action.uid],
-				color: action.color,
-			}
+			if (!state.known)
+				return state
 			return {
 				...state,
-				users,
+				users: {
+					...state.users,
+					[action.uid]: {
+						...state.users[action.uid],
+						color: action.color,
+					},	
+				},
+				lastChange: {
+					type: 'ApplyColor',
+					uid: action.uid,
+				}
+			}
+		}
+
+		case 'AddArea': {
+			if (!state.known)
+				return state
+			const areas = { ...state.users[action.uid].areas } // Clone the areas object for the user.
+			areas[action.aid] = action.area // Add the new area.
+			return {
+				...state,
+				users: {
+					...state.users,
+					[action.uid]: {
+						...state.users[action.uid],
+						areas,
+					}
+				},
+				lastChange: {
+					type: 'AddArea',
+					uid: action.uid,
+					aid: action.aid,
+				},
 			}
 		}
 
 		default: {
-			return state
+			return {
+				...state,
+				lastChange: null,
+			}
 		}
 	}
 }

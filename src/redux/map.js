@@ -34,10 +34,13 @@ const actions = {
 			if (!isSignedIn(user))
 				return
 			if (isValidPolygon(polygon)) {
-				firebase.database().ref(`public/users/${user.uid}/areas`).push(polygon)
+				firebase.database().ref(`public/users/${user.uid}/areas`).push(polygon).then(response => {
+					const aid = response.key
+					dispatch({ type: 'AddArea', area: polygon, uid: user.uid, aid }) // Add it to the UserData object.
+					dispatch({ type: 'CancelPolygon' }) // Remove it from the screen.
+				})
 				// TODO: ADD TO LOCAL STORAGE IN USER DATA.
 			}
-			dispatch({ type: 'CancelPolygon' })
 		}
 	),
 	cancelPolygon: () => ({
