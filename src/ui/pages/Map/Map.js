@@ -11,7 +11,7 @@ import { getMailLink, getDistance } from '../../../util.js'
 import { isSignedIn } from '../../../redux/user.js'
 import userDataActions from '../../../redux/userData.js'
 import mapActions from '../../../redux/map.js'
-import { colorToHex, hexToColor, getRandomColor, darken } from '../../../ui/colors.js'
+import { colorToHex, hexToColor, getRandomColor } from '../../../ui/colors.js'
 
 const defaultLocation = { // This location is chosen to be right in the middle of our area. So if we focus the map on that and choose an appropriate scale, we should have the full area on-screen.
 	lat: 52.7437793,
@@ -34,6 +34,9 @@ class Map extends Component {
 		this.processMapMouseMove = this.processMapMouseMove.bind(this)
 		this.processMapMouseOut = this.processMapMouseOut.bind(this)
 		this.processMapClick = this.processMapClick.bind(this)
+		this.processPolygonMouseMove = this.processPolygonMouseMove.bind(this)
+		this.processPolygonMouseOut = this.processPolygonMouseOut.bind(this)
+		this.processPolygonClick = this.processPolygonClick.bind(this)
 		this.mapIconStyle = this.mapIconStyle.bind(this)
 	}
 
@@ -71,7 +74,6 @@ class Map extends Component {
 				GM = result
 				this.updateMap()
 			}).catch((err) => {
-				console.error(err) // TODO REMOVE
 				this.setState({
 					error: true,
 				})
@@ -121,6 +123,40 @@ class Map extends Component {
 		// Add the current location to the currently active polygon.
 		this.props.addPolygonLocation(location)
 	}
+	processPolygonMouseMove(evt) {
+		if (evt.feature.getProperty('type') !== 'polygon')
+			return // Only do stuff for hovers over a polygon.
+		if (!this.props.userData.known)
+			return // Only do stuff when we have user data.
+
+		// In general, highlight the polygon.
+		this.props.setHoverArea(evt.feature.getId(), evt.feature.getProperty('uid'))
+
+		// If we are on the overview page, show the right info screen.
+		if (this.props.map.page === 'fullMap') {
+			const uid = evt.feature.getProperty('uid')
+			console.log('Show data for ' + this.props.userData.users[uid].name)
+		}
+	}
+	processPolygonMouseOut(evt) {
+		if (evt.feature.getProperty('type') !== 'polygon')
+			return // Only do stuff for hovers over a polygon.
+		if (!this.props.userData.known)
+			return // Only do stuff when we have user data.
+
+		// Revert the style to stop highlighting the polygon.
+		this.props.clearHoverArea()
+	}
+	processPolygonClick(evt) {
+		if (evt.feature.getProperty('type') !== 'polygon')
+			return // Only do stuff for hovers over a polygon.
+		if (!this.props.userData.known)
+			return // Only do stuff when we have user data.
+
+		if (this.props.map.page === 'ownAreas') {
+			this.props.activateArea(evt.feature.getId())
+		}
+	}
 
 	/*
 	 * Initialization functions.
@@ -156,21 +192,13 @@ class Map extends Component {
 			geometry: new GM.Data.Polygon([]),
 		})
 
+		// Set up listeners for interactive events.
+		this.map.data.addListener('mousemove', this.processPolygonMouseMove)
+		this.map.data.addListener('mouseout', this.processPolygonMouseOut)
+		this.map.data.addListener('click', this.processPolygonClick)
+
 		// Ensure that all polygons have the right style.
 		this.updatePolygonStyle()
-
-		// TODO: ADD EVENT LISTENERS TO SHOW INFORMATION ABOUT WHO IS IN WHAT AREA.
-		this.map.data.addListener('mouseover', (event) => {
-			if (event.feature.getProperty('type') !== 'polygon')
-				return // Only show stuff for hovers over a polygon.
-			if (!this.props.userData.known)
-				return // Only show stuff when we have user data.
-			if (this.props.map.page !== 'fullMap')
-				return // Only show stuff on the full map.
-
-			const uid = event.feature.getProperty('uid')
-			console.log('Show data for ' + this.props.userData.users[uid].name)
-		})
 	}
 	// initializeUserPolygons initializes the polygons for a single user.
 	initializeUserPolygons(uid) {
@@ -233,6 +261,13 @@ class Map extends Component {
 				}
 			}
 		}
+
+		// If the hover area or the active area changed, update styles too.
+		if (oldProps && this.props.map.hover !== oldProps.map.hover)
+			this.updatePolygonStyle()
+		if (oldProps && this.props.map.activeArea !== oldProps.map.activeArea)
+			this.updatePolygonStyle()
+
 
 		// Determine if we should update the current polygon.
 		if (!oldProps)
@@ -321,24 +356,40 @@ class Map extends Component {
 			}
 		}
 
-		// It's a polygon. Return polygon style. For this, first figure out what kind of polygon it is.
+		// It's a polygon. Return polygon style. For this, first figure out several area properties.
 		const geometry = feature.getGeometry()
-		const defaultOpacity = 0.5
 		const aid = feature.getId()
 		const uid = feature.getProperty('uid')
+		const isHoveringOn = (this.props.map.hover && aid === this.props.map.hover.aid)
+		const isActive = this.props.map.activeArea === aid
 		const numSides = geometry.getLength() > 0 ? geometry.getAt(0).getLength() : 0
 		const isCurrentUser = (uid === this.props.user.uid)
+
+		// Then determine various style properties.
 		const visible = this.props.map.page === 'fullMap' || (this.props.map.page === 'ownAreas' && isCurrentUser)
 		const color = hexToColor(this.props.userData.users[uid].color) || getRandomColor()
-		const dimFactor = (this.props.map.action === 'none' || aid === 'current' ? 1 : 0.6)
-		const useStroke = (aid === 'current' && (numSides <= 2 || this.props.map.action === 'editing'))
-		const useDarkStroke = aid === 'current' && this.props.map.action === 'editing'
+		const useStroke = (aid === 'current' && numSides <= 2) // Add a stroke when the user is placing his second point, so he already gets some visual feedback.
+		const clickable = (this.props.map.page === 'ownAreas' && (this.props.map.action !== 'adding' && this.props.map.action !== 'editing'))
+		// ToDo later: when editing a polygon, don't show it, but replace it by the active polygon. For this polygon, add a border which the user can click on to add markers. When the user makes his first edit, change the action from 'selecting' to 'editing'.
+
+		// Determine the opacity.
+		let opacity = 0.5 // Default opacity.
+		if (isActive)
+			opacity = 1 // This area is active.
+		else if (isHoveringOn && (clickable || this.props.map.page === 'fullMap'))
+			opacity = 0.8 // This area is being hovered on. (But we are not adding/editing stuff. When adding/editing, hovering over stuff is not relevant/possible.)
+		else if (this.props.map.activeArea)
+			opacity = 0.3 // Some other area is active.
+		else if (this.props.map.action !== 'none' && aid !== 'current')
+			opacity = 0.3 // We are adding/editing another area, so this area is faded.
+
 		return {
+			cursor: clickable ? 'pointer' : 'grab',
 			fillColor: colorToHex(color),
-			fillOpacity: defaultOpacity * dimFactor,
-			strokeColor: useDarkStroke ? colorToHex(darken(color, 0.4)) : colorToHex(color),
+			fillOpacity: opacity,
+			strokeColor: colorToHex(color),
 			strokeWeight: useStroke ? 8 : 0,
-			strokeOpacity: defaultOpacity * dimFactor,
+			strokeOpacity: opacity,
 			visible: visible,
 		}
 	}
@@ -427,11 +478,21 @@ class Map extends Component {
 			)
 		}
 		if (this.props.map.action === 'editing') {
-			// TODO: Add functions to process the edited area.
+			// TODO: Make editing functionalities. Afterwards, also set up these buttons properly.
 			return (
 				<div className="buttonHolder">
-					<div className="btn" onClick={() => this.props.setMapAction('none')}>Bevestig wijzigingen</div>
-					<div className="btn" onClick={() => this.props.setMapAction('none')}>Annuleer wijzigingen</div>
+					<div className="btn" onClick={() => this.props.clearActiveArea()}>Bevestig wijzigingen</div>
+					<div className="btn" onClick={() => this.props.clearActiveArea()}>Annuleer wijzigingen</div>
+					<div className="btn" onClick={() => this.props.setMapAction('none')}>Verwijder gebied</div>
+				</div>
+			)
+		}
+		if (this.props.map.action === 'selecting') {
+			// ToDo: After setting up editing functionalities, make buttons equal to editing case.
+			// TODO next: Add functions to process the delete area.
+			return (
+				<div className="buttonHolder">
+					<div className="btn" onClick={() => this.props.startAddingArea()}>Voeg een nieuw gebied toe</div>
 					<div className="btn" onClick={() => this.props.setMapAction('none')}>Verwijder gebied</div>
 				</div>
 			)
@@ -483,10 +544,15 @@ const actionMap = (dispatch) => ({
 	loadUserData: () => dispatch(userDataActions.loadData()),
 	setMapPage: (page) => dispatch(mapActions.setPage(page)),
 	setMapAction: (action) => dispatch(mapActions.setAction(action)),
+	startAddingArea: () => dispatch(mapActions.startAddingArea()),
 	setMouseLocation: (location) => dispatch(mapActions.setMouseLocation(location)),
 	addPolygonLocation: (location) => dispatch(mapActions.addPolygonLocation(location)),
 	removePolygonLocation: (locationIndex) => dispatch(mapActions.removePolygonLocation(locationIndex)),
 	confirmPolygon: () => dispatch(mapActions.confirmPolygon()),
 	cancelPolygon: () => dispatch(mapActions.cancelPolygon()),
+	setHoverArea: (aid, uid) => dispatch(mapActions.setHoverArea(aid, uid)),
+	clearHoverArea: () => dispatch(mapActions.clearHoverArea()),
+	activateArea: (aid) => dispatch(mapActions.activateArea(aid)),
+	clearActiveArea: () => dispatch(mapActions.clearActiveArea()),
 })
 export default connect(stateMap, actionMap)(Map)

@@ -15,6 +15,9 @@ const actions = {
 		type: 'SetMapAction',
 		action,
 	}),
+	startAddingArea: () => ({
+		type: 'StartAddingArea',
+	}),
 	setMouseLocation: (location) => ({
 		type: 'SetMapMouseLocation',
 		location,
@@ -39,13 +42,27 @@ const actions = {
 					dispatch({ type: 'AddArea', area: polygon, uid: user.uid, aid }) // Add it to the UserData object.
 					dispatch({ type: 'CancelPolygon' }) // Remove it from the screen.
 				})
-				// TODO: ADD TO LOCAL STORAGE IN USER DATA.
 			}
 		}
 	),
 	cancelPolygon: () => ({
 		type: 'CancelPolygon',
-	})
+	}),
+	setHoverArea: (aid, uid) => ({
+		type: 'SetHoverArea',
+		aid,
+		uid,
+	}),
+	clearHoverArea: () => ({
+		type: 'ClearHoverArea',
+	}),
+	activateArea: (aid) => ({
+		type: 'ActivateArea',
+		aid,
+	}),
+	clearActiveArea: () => ({
+		type: 'ClearActiveArea',
+	}),
 }
 export default actions
 
@@ -57,10 +74,13 @@ export function reducer(state = getDefaultState(), action) {
 	switch (action.type) {
 
 		case 'SetMapPage': {
-			return {
+			state = {
 				...state,
 				page: action.page,
 			}
+			delete state.hover
+			delete state.activeArea
+			return state
 		}
 
 		case 'SetMapAction': {
@@ -68,6 +88,17 @@ export function reducer(state = getDefaultState(), action) {
 				...state,
 				action: action.action,
 			}
+		}
+
+		case 'StartAddingArea': {
+			state = {
+				...state,
+				action: 'adding',
+				currentPolygon: [],
+			}
+			delete state.hover
+			delete state.activeArea
+			return state
 		}
 
 		case 'SetMapMouseLocation': {
@@ -101,6 +132,43 @@ export function reducer(state = getDefaultState(), action) {
 				action: 'none',
 				currentPolygon: [],
 			}
+		}
+
+		case 'SetHoverArea': {
+			if (state.hover && state.hover.aid === action.aid)
+				return state // Don't do anything if the area is the same.
+			return {
+				...state,
+				hover: {
+					aid: action.aid,
+					uid: action.uid,
+				}
+			}
+		}
+
+		case 'ClearHoverArea': {
+			state = { ...state }
+			delete state.hover
+			return state
+		}
+
+		case 'ActivateArea': { // When the user is in edit mode and clicks on an area.
+			if (state.activeArea === action.aid)
+				return state // Don't do anything if the area is the same.
+			return {
+				...state,
+				action: 'selecting', // This means we have selected an area, but have not edited it yet.
+				activeArea: action.aid,
+			}
+		}
+
+		case 'ClearActiveArea': {
+			state = {
+				...state,
+				action: 'none',
+			}
+			delete state.activeArea
+			return state
 		}
 
 		default: {
