@@ -20,21 +20,6 @@ const actions = {
 			user: getState().user,
 		})
 	),
-	loadSettings: () => (
-		// TODO: CHECK IF WE STILL NEED THIS FUNCTION.
-		(dispatch, getState) => {
-			const user = getState().user
-			if (!isSignedIn(user))
-				return
-			firebase.database().ref(`private/users/${user.uid}/settings`).once('value').then((snapshot) => {
-				dispatch({
-					type: 'ApplySettings',
-					source: 'firebase',
-					setting: snapshot.val()
-				})
-			})
-		}
-	),
 }
 export default actions
 

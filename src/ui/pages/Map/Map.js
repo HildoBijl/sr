@@ -135,7 +135,9 @@ class Map extends Component {
 		// If we are on the overview page, show the right info screen.
 		if (this.props.map.page === 'fullMap') {
 			const uid = evt.feature.getProperty('uid')
-			console.log('Show data for ' + this.props.userData.users[uid].name)
+			const projection = this.overlay.getProjection()
+			const xy = projection.fromLatLngToContainerPixel(evt.latLng)
+			this.props.showUserData(uid, { x: xy.x, y: xy.y })
 		}
 	}
 	processPolygonMouseOut(evt) {
@@ -144,18 +146,22 @@ class Map extends Component {
 		if (!this.props.userData.known)
 			return // Only do stuff when we have user data.
 
-		// Revert the style to stop highlighting the polygon.
+		// Revert the style to stop highlighting the polygon as well as hide the user data.
 		this.props.clearHoverArea()
+		if (this.props.map.page === 'fullMap')
+			this.props.hideUserData()
 	}
 	processPolygonClick(evt) {
 		if (evt.feature.getProperty('type') !== 'polygon')
 			return // Only do stuff for hovers over a polygon.
 		if (!this.props.userData.known)
 			return // Only do stuff when we have user data.
+		if (this.props.map.page === 'fullMap')
+			return this.processPolygonMouseMove(evt) // When we're on the full map, treat a click like a mouse move. This is useful for smartphones.
+		if (this.props.map.action !== 'none' && this.props.map.action !== 'selecting')
+			return // Don't do stuff when we're not in the right action.
 
-		if (this.props.map.page === 'ownAreas') {
-			this.props.activateArea(evt.feature.getId())
-		}
+		this.props.switchActiveArea(evt.feature.getId())
 	}
 
 	/*
@@ -175,6 +181,11 @@ class Map extends Component {
 		this.map = new GM.Map(this.mapObj, options)
 		this.addMapEventListeners(this.map) // Listen to all required events.
 		this.addMapEventListeners(this.map.data) // Listen to all required events.
+
+		// Set up an empty (hence invisible) overlay. This allows us to transform lat/lng coordinates to x/y screen coordinates.
+		this.overlay = new GM.OverlayView()
+		this.overlay.draw = () => { }
+		this.overlay.setMap(this.map)
 	}
 	// initializePolygons sets up the polygonical areas when the data from all the users has loaded.
 	initializePolygons() {
@@ -218,6 +229,11 @@ class Map extends Component {
 			geometry: new GM.Data.Polygon([area]),
 		})
 	}
+	// removePolygon removes a polygon with the given aid and uid from the map.
+	removePolygon(aid, uid) {
+		this.map.data.remove(this.userPolygons[uid][aid])
+		delete this.userPolygons[uid][aid]
+	}
 
 	/*
 	 * Update functions.
@@ -256,6 +272,10 @@ class Map extends Component {
 					this.initializePolygon(area, change.aid, change.uid)
 					break;
 				}
+				case 'RemoveArea': {
+					this.removePolygon(change.aid, change.uid)
+					break;
+				}
 				default: {
 					break;
 				}
@@ -267,7 +287,6 @@ class Map extends Component {
 			this.updatePolygonStyle()
 		if (oldProps && this.props.map.activeArea !== oldProps.map.activeArea)
 			this.updatePolygonStyle()
-
 
 		// Determine if we should update the current polygon.
 		if (!oldProps)
@@ -299,7 +318,7 @@ class Map extends Component {
 			return
 
 		// Figure out which polygon to display, and display it.
-		const polygon = this.props.map.currentPolygon.slice(0)
+		let polygon = this.props.map.currentPolygon.slice(0)
 		if (this.props.map.mouse && !this.isMouseCloseTo(polygon[0]) && !this.isMouseCloseTo(polygon[polygon.length - 1]))
 			polygon.push(this.props.map.mouse)
 		this.setMarkerLocations(polygon) // Set the markers in the right location.
@@ -351,6 +370,7 @@ class Map extends Component {
 					fillColor: this.props.user.color,
 					fillOpacity: 1,
 					scale: 8,
+					visible: (this.props.map.action === 'adding'),
 				},
 				zIndex: Math.floor(Math.random() * 1000), // TODO: Calculate size of the area, and use a negative version of it for the z-index to ensure small areas to appear on top.
 			}
@@ -361,9 +381,13 @@ class Map extends Component {
 		const aid = feature.getId()
 		const uid = feature.getProperty('uid')
 		const isHoveringOn = (this.props.map.hover && aid === this.props.map.hover.aid)
-		const isActive = this.props.map.activeArea === aid
+		const isActive = this.props.map.page === 'ownAreas' && this.props.map.activeArea === aid
 		const numSides = geometry.getLength() > 0 ? geometry.getAt(0).getLength() : 0
 		const isCurrentUser = (uid === this.props.user.uid)
+
+		// If there is no uid, then we are dealing with the current polygon while the user is not logged in. It should not be visible.
+		if (!uid)
+			return { visible: false }
 
 		// Then determine various style properties.
 		const visible = this.props.map.page === 'fullMap' || (this.props.map.page === 'ownAreas' && isCurrentUser)
@@ -409,7 +433,7 @@ class Map extends Component {
 				<div className="map">
 					{this.renderIntroduction()}
 					<p>Raap jij ook regelmatig zwerfvuil op? Als je <Link to={{ type: 'ACCOUNT' }}>inlogt</Link> kun je jezelf ook toevoegen op de kaart.</p>
-					<div key="googleMap" id="googleMap" ref={map => this.mapObj = map} />
+					{this.renderMap()}
 				</div>
 			)
 		}
@@ -418,37 +442,18 @@ class Map extends Component {
 				<div className="map">
 					{this.renderControlButtons()}
 					{this.renderIntroduction()}
-					<div key="googleMap" id="googleMap" ref={map => this.mapObj = map} />
+					{this.renderMap()}
 				</div>
 			)
 		}
 		return ( // Signed in and editing. This is the case when `this.props.map.page === 'ownAreas'.
 			<div className="map">
 				{this.renderControlButtons()}
-				<p>Je kunt hier zelf aangeven waar jij regelmatig (minimaal enkele keren per jaar) zwerfvuil aan het rapen bent.</p>
 				{this.renderEditingButtons()}
-				<div key="googleMap" id="googleMap" ref={map => this.mapObj = map} />
-				<div className="sizeWarning">
-					<p>Als je de gebieden waar jij in raapt aan wilt passen, dan kun je het beste achter een computer met een redelijk groot scherm zitten. Anders wordt het een hoop priegelwerk. Dus zoek een groot scherm op, en dan vertel ik je verder hoe het werkt.</p>
-				</div>
-				<div className="explanation">
-					<p>Gebieden toevoegen en/of aanpassen is niet heel moeilijk. Wil je een ... </p>
-					<ul>
-						<li>gebied toevoegen? Gebruik de "Nieuw gebied" knop boven de kaart. Plaats vervolgens de hoekpunten van het gebied door op de kaart te klikken. Klik op "Klaar met gebied", of op het allereerst toevoegde hoekpunt, om het gebied te bevestigen.</li>
-						<li>gebied verwijderen? Klik op het betreffende gebied en vervolgens op de knop "Verwijder gebied" boven de kaart.</li>
-						<li>gebied wijzigen? Klik op het betreffende gebied. Je kunt nu ...
-								<ul>
-								<li>hoekpunten verplaatsen door de betreffende hoekpunten te verslepen.</li>
-								<li>hoekpunten toevoegen door de rand van een gebied te verslepen.</li>
-								<li>hoekpunten verwijderen door een hoekpunt op een ander bestaand hoekpunt te slepen.</li>
-							</ul>
-						</li>
-					</ul>
-					<p>Als je niet meer actief bent als raper, dan kun je ook <span className="btn inline">al je gebieden verwijderen</span></p>
-				</div>
+				<p>Je kunt via de bovenstaande knoppen zelf aangeven waar jij regelmatig (minimaal enkele keren per jaar) zwerfvuil raapt.</p>
+				{this.renderMap()}
 			</div>
 		)
-		// TODO: IMPLEMENT DELETE ALL BUTTON ABOVE.
 	}
 	renderControlButtons() {
 		return (
@@ -459,21 +464,23 @@ class Map extends Component {
 		)
 	}
 	renderIntroduction() {
-		return <p>Op de onderstaande kaart kun je zien waar er geraapt wordt. Klik op een gekleurd vlak om te zien wie in dat gebied actief is.</p>
+		return ''
+		// return <p>Op de onderstaande kaart kun je zien waar er geraapt wordt. Klik op een gekleurd vlak om te zien wie in dat gebied actief is.</p>
 	}
 	renderEditingButtons() {
 		if (this.props.map.action === 'none') {
 			return (
 				<div className="buttonHolder">
-					<div className="btn" onClick={() => this.props.setMapAction('adding')}>Voeg een nieuw gebied toe</div>
+					<div key="add" className="btn" onClick={() => this.props.setMapAction('adding')}>Voeg een nieuw gebied toe</div>
+					<div key="delete" className="btn" disabled={true}>Verwijder gebied</div>
 				</div>
 			)
 		}
 		if (this.props.map.action === 'adding') {
 			return (
 				<div className="buttonHolder">
-					<div className="btn" onClick={this.props.confirmPolygon}>Bevestig gebied</div>
-					<div className="btn" onClick={this.props.cancelPolygon}>Annuleer gebied</div>
+					<div key="confirm" className="btn" onClick={this.props.confirmPolygon}>Bevestig gebied</div>
+					<div key="cancel" className="btn" onClick={this.props.cancelPolygon}>Annuleer gebied</div>
 				</div>
 			)
 		}
@@ -481,19 +488,18 @@ class Map extends Component {
 			// TODO: Make editing functionalities. Afterwards, also set up these buttons properly.
 			return (
 				<div className="buttonHolder">
-					<div className="btn" onClick={() => this.props.clearActiveArea()}>Bevestig wijzigingen</div>
-					<div className="btn" onClick={() => this.props.clearActiveArea()}>Annuleer wijzigingen</div>
-					<div className="btn" onClick={() => this.props.setMapAction('none')}>Verwijder gebied</div>
+					<div key="confirm" className="btn" onClick={() => this.props.clearActiveArea()}>Bevestig wijzigingen</div>
+					<div key="cancel" className="btn" onClick={() => this.props.clearActiveArea()}>Annuleer wijzigingen</div>
+					<div key="delete" className="btn" onClick={() => this.props.deleteActiveArea()}>Verwijder gebied</div>
 				</div>
 			)
 		}
 		if (this.props.map.action === 'selecting') {
 			// ToDo: After setting up editing functionalities, make buttons equal to editing case.
-			// TODO next: Add functions to process the delete area.
 			return (
 				<div className="buttonHolder">
-					<div className="btn" onClick={() => this.props.startAddingArea()}>Voeg een nieuw gebied toe</div>
-					<div className="btn" onClick={() => this.props.setMapAction('none')}>Verwijder gebied</div>
+					<div key="add" className="btn" onClick={() => this.props.startAddingArea()}>Voeg een nieuw gebied toe</div>
+					<div key="delete" className="btn" onClick={() => this.props.deleteActiveArea()}>Verwijder gebied</div>
 				</div>
 			)
 		}
@@ -503,6 +509,47 @@ class Map extends Component {
 		return (
 			<div className="map">
 				<p>Oops ... er is iets mis gegaan bij het laden van de kaart. Probeer de pagina te verversen. Mocht dit niet helpen, en mocht je zeker weten dat je internetverbinding goed werkt, stuur ons dan even een mailtje via {getMailLink()}.</p>
+			</div>
+		)
+	}
+	renderMap() {
+		return (
+			<div key="mapContainer" className="mapContainer">
+				<div key="googleMap" id="googleMap" ref={map => this.mapObj = map} />
+				{this.renderUserData()}
+			</div>
+		)
+	}
+	renderUserData() {
+		// Don't show user data in various cases.
+		if (!this.props.userData.known)
+			return ''
+		if (this.props.map.page !== 'fullMap')
+			return ''
+		if (!this.props.map.showUserData)
+			return ''
+
+		// Extract the user.
+		const uid = this.props.map.showUserData.uid
+		const user = this.props.userData.users[uid]
+		const xy = this.props.map.showUserData.xy
+		const color = hexToColor(user.color)
+		const textColor = (color.reduce((sum, v) => sum + v, 0) / 3 > 160 ? '#111' : '#eee')
+		const name = user.name || 'Anonieme Raper'
+
+		// Generate the HTML.
+		return (
+			<div className="userData" style={{
+				background: user.color,
+				color: textColor,
+				left: xy.x + 16,
+				top: xy.y,
+			}}>
+				{user.picture ? <img className="picture" src={user.picture} alt={`Foto van ${user.name || 'een Stille Raper'}`} /> : ''}
+				<div className="userInfo">
+					{user.name || !user.picture ? <div className="name">{name}</div> : ''}
+					{user.email ? <div className="email">{user.email}</div> : ''}
+				</div>
 			</div>
 		)
 	}
@@ -552,7 +599,10 @@ const actionMap = (dispatch) => ({
 	cancelPolygon: () => dispatch(mapActions.cancelPolygon()),
 	setHoverArea: (aid, uid) => dispatch(mapActions.setHoverArea(aid, uid)),
 	clearHoverArea: () => dispatch(mapActions.clearHoverArea()),
-	activateArea: (aid) => dispatch(mapActions.activateArea(aid)),
+	switchActiveArea: (aid) => dispatch(mapActions.switchActiveArea(aid)),
 	clearActiveArea: () => dispatch(mapActions.clearActiveArea()),
+	deleteActiveArea: () => dispatch(mapActions.deleteActiveArea()),
+	showUserData: (uid, xy) => dispatch(mapActions.showUserData(uid, xy)),
+	hideUserData: () => dispatch(mapActions.hideUserData()),
 })
 export default connect(stateMap, actionMap)(Map)

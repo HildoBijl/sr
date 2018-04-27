@@ -62,12 +62,46 @@ export function reducer(state = getDefaultState(), action) {
 					[action.uid]: {
 						...state.users[action.uid],
 						color: action.color,
-					},	
+					},
 				},
 				lastChange: {
 					type: 'ApplyColor',
 					uid: action.uid,
 				}
+			}
+		}
+
+		case 'ApplySettings': {
+			// When the settings (on which data of the user to show) are adjusted, then also process this in the user data of the user.
+			if (!state.known)
+				return state
+			const settings = action.setting
+			const user = action.user
+			const userData = { ...state.users[user.uid] }
+			if (settings.showName !== undefined) {
+				if (settings.showName)
+					userData.name = user.name
+				else
+					delete userData.name
+			}
+			if (settings.showEmail !== undefined) {
+				if (settings.showEmail)
+					userData.email = user.email
+				else
+					delete userData.email
+			}
+			if (settings.showPicture !== undefined) {
+				if (settings.showPicture)
+					userData.picture = user.picture
+				else
+					delete userData.picture
+			}
+			return {
+				...state,
+				users: {
+					...state.users,
+					[user.uid]: userData,
+				},
 			}
 		}
 
@@ -87,6 +121,28 @@ export function reducer(state = getDefaultState(), action) {
 				},
 				lastChange: {
 					type: 'AddArea',
+					uid: action.uid,
+					aid: action.aid,
+				},
+			}
+		}
+
+		case 'RemoveArea': {
+			if (!state.known)
+				return state
+			const areas = { ...state.users[action.uid].areas } // Clone the areas object for the user.
+			delete areas[action.aid] // Remove the given area.
+			return {
+				...state,
+				users: {
+					...state.users,
+					[action.uid]: {
+						...state.users[action.uid],
+						areas,
+					}
+				},
+				lastChange: {
+					type: 'RemoveArea',
 					uid: action.uid,
 					aid: action.aid,
 				},

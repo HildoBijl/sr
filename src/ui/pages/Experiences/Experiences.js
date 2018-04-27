@@ -10,9 +10,9 @@ class Experiences extends Component {
 	render() {
 		return (
 			<div className="home">
-				<p>Tijdens hun tochten komen de Stille Rapers vaak verrassende dingen tegen. Hieronder kun je enkele ervaringen lezen.</p>
+				<p>Tijdens de tochten komen de Stille Rapers vaak verrassende dingen tegen. Hieronder kun je enkele ervaringen lezen.</p>
 				<p className="intro">Heb je zelf een ervaring die je wilt delen? Stuur hem dan naar {getMailLink()}, het liefst samen met een foto. Dan zetten wij hem online.</p>
-				<NewsOverview type="experiences" maxItems="6" />
+				<NewsOverview type="experiences" maxItems="15" />
 			</div>
 		)
 	}

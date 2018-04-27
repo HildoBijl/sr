@@ -2,32 +2,53 @@
 
 .map {
 
-	#googleMap {
-		margin: 20px auto;
-		padding-bottom: 50%;
+	.mapContainer {
 		position: relative;
-		width: 100%;
 
-		& > div {
-			bottom: 0;
-			left: 0;
+		.userData {
+			align-items: center;
+			border-radius: 12px;
+			display: flex;
+			flex-flow: row nowrap;
+			padding: 8px 12px 8px 8px;
 			position: absolute;
-			right: 0;
-			top: 0;
+			transform: translateY(-50%);
+			z-index: 2;
+
+			.picture {
+				margin: 0 8px 0 0;
+
+				max-height: 60px;
+				max-width: 60px;
+				@media @phoneLandscape {
+					max-height: 90px;
+					max-width: 90px;
+				}
+				@media @desktop {
+					max-height: 120px;
+					max-width: 120px;
+				}
+
+				&:last-child {
+					margin: 0;
+				}
+			}
+			.userInfo {
+				display: flex;
+				flex-flow: column nowrap;
+			}
 		}
+
+		#googleMap {
+			margin: 20px auto;
+			padding-bottom: 50%;
+			position: relative;
+			width: 100%;
+			z-index: 1;
+		}	
 	}
 
-	.explanation {
-		display: none;
-		@media @desktop {
-			display: block;
-		}
+	.buttonHolder {
+		margin-bottom: 4px;
 	}
-	.sizeWarning {
-		display: block;
-		@media @desktop {
-			display: none;
-		}
-	}
-
 }

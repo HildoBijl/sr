@@ -56,13 +56,38 @@ const actions = {
 	clearHoverArea: () => ({
 		type: 'ClearHoverArea',
 	}),
-	activateArea: (aid) => ({
-		type: 'ActivateArea',
+	switchActiveArea: (aid) => ({
+		type: 'SwitchActiveArea',
 		aid,
 	}),
 	clearActiveArea: () => ({
 		type: 'ClearActiveArea',
 	}),
+	deleteActiveArea: () => (
+		(dispatch, getState) => {
+			// Extract required data, and do checks which should never happen in the first place.
+			const user = getState().user
+			const activeArea = getState().map.activeArea
+			if (!isSignedIn(user))
+				return
+			if (!activeArea)
+				return
+
+			// Send the request to Firebase to delete the given area.
+			firebase.database().ref(`public/users/${user.uid}/areas`).child(activeArea).remove().then(() => {
+				dispatch({ type: 'RemoveArea', aid: activeArea, uid: user.uid }) // Remove it from the UserData object.
+				dispatch({ type: 'ClearActiveArea' }) // Make sure no area is active.
+			})
+		}
+	),
+	showUserData: (uid, xy) => ({
+		type: 'ShowUserData',
+		uid,
+		xy,
+	}),
+	hideUserData: () => ({
+		type: 'HideUserData',
+	})
 }
 export default actions
 
@@ -79,7 +104,7 @@ export function reducer(state = getDefaultState(), action) {
 				page: action.page,
 			}
 			delete state.hover
-			delete state.activeArea
+			delete state.showUserData
 			return state
 		}
 
@@ -98,6 +123,7 @@ export function reducer(state = getDefaultState(), action) {
 			}
 			delete state.hover
 			delete state.activeArea
+			delete state.mouse
 			return state
 		}
 
@@ -120,10 +146,12 @@ export function reducer(state = getDefaultState(), action) {
 		case 'RemovePolygonLocation': {
 			const currentPolygon = state.currentPolygon.slice(0) // Clone the array.
 			currentPolygon.splice(action.locationIndex, 1) // Remove an element.
-			return {
+			state = {
 				...state,
 				currentPolygon,
 			}
+			delete state.mouse // Remove the mouse location, ensuring that we don't show any marker on the polygon location that we just removed.
+			return state
 		}
 
 		case 'CancelPolygon': {
@@ -152,9 +180,18 @@ export function reducer(state = getDefaultState(), action) {
 			return state
 		}
 
-		case 'ActivateArea': { // When the user is in edit mode and clicks on an area.
-			if (state.activeArea === action.aid)
-				return state // Don't do anything if the area is the same.
+		case 'SwitchActiveArea': { // When the user is in edit mode and clicks on an area.
+			// If we already selected this area, deselect it.
+			if (state.activeArea === action.aid) {
+				state = {
+					...state,
+					action: 'none',
+				}
+				delete state.activeArea
+				return state
+			}
+
+			// Select the area.
 			return {
 				...state,
 				action: 'selecting', // This means we have selected an area, but have not edited it yet.
@@ -171,6 +208,22 @@ export function reducer(state = getDefaultState(), action) {
 			return state
 		}
 
+		case 'ShowUserData': {
+			return {
+				...state,
+				showUserData: {
+					uid: action.uid,
+					xy: action.xy,
+				},
+			}
+		}
+
+		case 'HideUserData': {
+			state = { ...state }
+			delete state.showUserData
+			return state
+		}
+
 		default: {
 			return state
 		}
@@ -179,8 +232,8 @@ export function reducer(state = getDefaultState(), action) {
 
 function getDefaultState() {
 	return {
-		page: 'ownAreas', // TODO: Set this to 'fullMap' to make it default to go to the full map.
-		action: 'none', // Can be 'none', 'adding' or 'editing'.
+		page: 'fullMap',
+		action: 'none', // Can be 'none', 'adding', 'selecting' or 'editing'.
 		currentPolygon: [], // The coordinates of the polygon that we're currently editing.
 	}
 }
