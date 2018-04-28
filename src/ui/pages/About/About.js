@@ -13,7 +13,7 @@ class About extends Component {
 
 				<img src={NHN} className="gebied top" alt="Wij zijn actief in Noord-Holland boven het Noordzeekanaal" />
 
-				<p>Nederland heeft tal van mooie natuur om in te wandelen, fietsen en kanoën. Helaas ligt er veel zwerfvuil in de bermen en in het water. Je kunt hierover klagen, maar wij ruimen het liever op.</p>
+				<p>Nederland heeft tal van mooie natuur om in te wandelen, fietsen en varen. Helaas ligt er veel zwerfvuil in de bermen en in het water. Je kunt hierover klagen, maar wij ruimen het liever op.</p>
 
 				<h3>De Stille Rapers</h3>
 
@@ -38,7 +38,7 @@ class About extends Component {
 				<h3>Contact</h3>
 				<p>Je kunt de Stille Rapers het beste via de mail bereiken, via {getMailLink()}.</p>
 
-				<h3>Soortgelijke projecten</h3>
+				<h3>Andere zwerfvuil opruim initiatieven</h3>
 				<p>Er zijn verschillende andere partijen die, net als de Stille Rapers, in actie komen tegen zwerfvuil.</p>
 				<ul>
 					<li>De Zaanse Schonen is een groep wandelaars (vooral omgeving Krommenie) die zich elke week verzamelt om hun omgeving schoon te houden. Je kunt ze vinden via hun <a href="https://www.facebook.com/ZaanseSchonen/" target="_blank" rel="noopener noreferrer">Facebook pagina</a>.</li>

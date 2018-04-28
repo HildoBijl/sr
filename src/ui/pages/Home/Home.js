@@ -10,7 +10,8 @@ class Home extends Component {
 	render() {
 		return (
 			<div className="home">
-				<p>Wij zijn de Stille Rapers: vrijwilligers die tijdens het wandelen, fietsen en/of kanoën zwerfvuil meenemen, om op die manier de natuur schoon te houden.</p>
+				<p className="quote">"Zelfs het kleinste wat je doet voor het milieu is belangrijk!"<span className="seperator">-</span><span className="attribution">Wubbo Ockels</span></p>
+				<p>Wij zijn de Stille Rapers: vrijwilligers die tijdens het wandelen, fietsen en/of varen zwerfvuil meenemen, om op die manier de natuur schoon te houden.</p>
 				<p className="intro">Via deze website delen wij onze <Link to={{ type: 'EXPERIENCES' }}>ervaringen</Link> met elkaar en met de buitenwereld, en via de <Link to={{ type: 'MAP' }}>interactieve kaart</Link> weten we elkaar te vinden.</p>
 				<NewsOverview type="news" maxItems="6" />
 			</div>

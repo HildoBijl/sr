@@ -1,3 +1,56 @@
-.home .intro {
-  margin-bottom: 20px;
+.pagePadding {
+  padding: 15px 8px;
+}
+@media (min-width: 480.01px) and (max-width: 960px) {
+  .pagePadding {
+    padding: 20px 16px;
+  }
+}
+@media (min-width: 960.01px) {
+  .pagePadding {
+    padding: 28px 24px;
+  }
+}
+.notSelectable {
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+.page .pageFader .home p.quote {
+  color: #777;
+  font-size: 20px;
+  font-style: italic;
+  font-weight: bold;
+  margin: 12px 0 20px;
+  text-align: center;
+}
+@media (min-width: 960.01px) {
+  .page .pageFader .home p.quote {
+    margin-bottom: 30px;
+  }
+}
+.page .pageFader .home p.quote .seperator {
+  font-style: normal;
+  margin: 0 16px;
+}
+@media (max-width: 480px) {
+  .page .pageFader .home p.quote .seperator {
+    display: none;
+  }
+}
+.page .pageFader .home p.quote .attribution {
+  font-style: normal;
+}
+@media (max-width: 480px) {
+  .page .pageFader .home p.quote .attribution {
+    display: block;
+    margin-top: 8px;
+  }
+}
+.page .pageFader .home .intro {
+  margin-bottom: 34px;
+}
+@media (min-width: 960.01px) {
+  .page .pageFader .home .intro {
+    margin-bottom: 40px;
+  }
 }

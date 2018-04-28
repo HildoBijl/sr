@@ -46,8 +46,18 @@
   align-items: center;
   display: flex;
   flex-flow: row nowrap;
-  margin: 16px auto;
+  margin: 12px auto 16px;
   max-width: 600px;
+}
+@media (min-width: 480.01px) {
+  .account .signInButtons {
+    margin: 8px auto 16px;
+  }
+}
+@media (min-width: 960.01px) {
+  .account .signInButtons {
+    margin: 8px auto 24px;
+  }
 }
 .account .signInButtons .btn {
   flex-grow: 1;

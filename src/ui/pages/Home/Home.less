@@ -1,5 +1,41 @@
-.home {
+@import '../../shared/params.less';
+
+.page .pageFader .home {
+	p.quote {
+		color: #777;
+		font-size: 20px;
+		font-style: italic;
+		font-weight: bold;
+		margin: 12px 0 20px;
+		text-align: center;
+
+		@media @desktop {
+			margin-bottom: 30px;
+		}
+
+		.seperator {
+			font-style: normal;
+			margin: 0 16px;
+
+			@media @phonePortrait {
+				display: none;
+			}
+		}
+		.attribution {
+			font-style: normal;
+
+			@media @phonePortrait {
+				display: block;
+				margin-top: 8px;
+			}
+		}
+	}
+
 	.intro {
-		margin-bottom: 20px;
+		margin-bottom: 34px;
+
+		@media @desktop {
+			margin-bottom: 40px;
+		}
 	}
 }
