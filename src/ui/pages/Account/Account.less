@@ -95,33 +95,44 @@
 	}
 
 	// Style for the settings part.
-	.colorSelection {
-		display: flex;
-		flex-flow: row wrap;
-		margin: -5px -5px 12px;
+	.colorPicker {
+		margin: 20px 0 20px;
+		
+		.colorSelection {
+			display: flex;
+			flex-flow: row wrap;
+			margin: -2px -5px 12px;
+		}
 	}
 
-	.settings {
-		align-items: center;
-		display: flex;
-		flex-flow: row nowrap;
+	.privacySettings {
+		margin: 16px 0 0;
 
-		.checkboxes {
-			flex-grow: 1;
-			flex-shrink: 1;
+		& > p:first-child {
+			margin-bottom: 4px;
 		}
+		.settings {
+			align-items: center;
+			display: flex;
+			flex-flow: row nowrap;
 
-		.picture {
-			border-radius: 25%;
-			flex-shrink: 0;
-			height: 100px;
-			margin: 0 0 0 16px;
-			opacity: 0.5;
-			transition: opacity @slowTime;
-			width: 100px;
+			.checkboxes {
+				flex-grow: 1;
+				flex-shrink: 1;
+			}
 
-			&.visible {
-				opacity: 1;
+			.picture {
+				border-radius: 25%;
+				flex-shrink: 0;
+				height: 100px;
+				margin: 0 0 0 16px;
+				opacity: 0.5;
+				transition: opacity @slowTime;
+				width: 100px;
+
+				&.visible {
+					opacity: 1;
+				}
 			}
 		}
 	}

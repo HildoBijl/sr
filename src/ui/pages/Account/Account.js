@@ -97,30 +97,34 @@ class Account extends Component {
           <div className="btn" onClick={this.props.signOut}>Log uit</div>
         </div>
         <p>Je kunt op de <Link to={{ type: 'MAP' }}>interactieve kaart</Link> markeren in welke gebieden jij actief bent als Stille Raper. Zo kun je aan anderen laten zien dat ze niet alleen bezig zijn.</p>
-        <p>Jouw gebieden op de kaart hebben de volgende kleur.</p>
-        <div className="colorSelection">
-          {colors.map((color, i) => <Circle key={i} color={color} active={colorToHex(color) === user.color} onClick={() => this.props.setColor(color)} />)}
-        </div>
-        <p>Ook laten we aan andere bezoekers de volgende informatie van je zien.</p>
-        <div className="settings">
-          <div className="checkboxes">
-            <Checkbox
-              label="Je naam"
-              checked={settings.showName}
-              changeFunction={(newVal) => this.props.applySettings({ showName: newVal })}
-            />
-            <Checkbox
-              label="Je afbeelding"
-              checked={settings.showPicture}
-              changeFunction={(newVal) => this.props.applySettings({ showPicture: newVal })}
-            />
-            <Checkbox
-              label="Je email-adres"
-              checked={settings.showEmail}
-              changeFunction={(newVal) => this.props.applySettings({ showEmail: newVal })}
-            />
+        <div className="colorPicker">
+          <p>Jouw gebieden op de kaart hebben de volgende kleur.</p>
+          <div className="colorSelection">
+            {colors.map((color, i) => <Circle key={i} color={color} active={colorToHex(color) === user.color} onClick={() => this.props.setColor(color)} />)}
           </div>
-          <img className={classnames('picture', { visible: settings.showPicture })} src={user.picture} alt="Profielfoto" />
+        </div>
+        <div className="privacySettings">
+          <p>Ook laten we aan andere bezoekers de volgende informatie van je zien.</p>
+          <div className="settings">
+            <div className="checkboxes">
+              <Checkbox
+                label="Je naam"
+                checked={settings.showName}
+                changeFunction={(newVal) => this.props.applySettings({ showName: newVal })}
+              />
+              <Checkbox
+                label="Je afbeelding"
+                checked={settings.showPicture}
+                changeFunction={(newVal) => this.props.applySettings({ showPicture: newVal })}
+              />
+              <Checkbox
+                label="Je email-adres"
+                checked={settings.showEmail}
+                changeFunction={(newVal) => this.props.applySettings({ showEmail: newVal })}
+              />
+            </div>
+            <img className={classnames('picture', { visible: settings.showPicture })} src={user.picture} alt="Profielfoto" />
+          </div>
         </div>
         <p>Je afbeelding (rechts) hebben we van Google/Facebook doorgekregen toen je inlogde.</p>
       </div>

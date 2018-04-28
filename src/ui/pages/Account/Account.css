@@ -101,21 +101,30 @@
     display: block;
   }
 }
-.account .colorSelection {
+.account .colorPicker {
+  margin: 20px 0 20px;
+}
+.account .colorPicker .colorSelection {
   display: flex;
   flex-flow: row wrap;
-  margin: -5px -5px 12px;
+  margin: -2px -5px 12px;
 }
-.account .settings {
+.account .privacySettings {
+  margin: 16px 0 0;
+}
+.account .privacySettings > p:first-child {
+  margin-bottom: 4px;
+}
+.account .privacySettings .settings {
   align-items: center;
   display: flex;
   flex-flow: row nowrap;
 }
-.account .settings .checkboxes {
+.account .privacySettings .settings .checkboxes {
   flex-grow: 1;
   flex-shrink: 1;
 }
-.account .settings .picture {
+.account .privacySettings .settings .picture {
   border-radius: 25%;
   flex-shrink: 0;
   height: 100px;
@@ -124,6 +133,6 @@
   transition: opacity 400ms;
   width: 100px;
 }
-.account .settings .picture.visible {
+.account .privacySettings .settings .picture.visible {
   opacity: 1;
 }
