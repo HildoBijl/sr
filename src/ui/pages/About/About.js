@@ -21,7 +21,7 @@ class About extends Component {
 
 				<img src={NHN} className="gebied middle" alt="Wij zijn actief in Noord-Holland boven het Noordzeekanaal" />
 
-				<p>Zwerfvuil rapen heeft alleen maar voordelen.</p>
+				<p>Zwerfvuil rapen heeft alleen maar voordelen:</p>
 				<ol>
 					<li>We zijn heerlijk buiten in de natuur.</li>
 					<li>We hebben de nodige lichaamsbeweging en voelen ons fit (zonder sportschool).</li>
@@ -30,7 +30,7 @@ class About extends Component {
 				<p>Als iedereen drie stuks zwerfvuil per week opraapt, is er geen zwerfvuil meer.</p>
 
 				<h3>Hoe is het ontstaan?</h3>
-				<p>Op 13 oktober 2017 nodigde Het Hoogheemraadschap Hollands Noorderkwartier (HHNK) alle Stille Rapers in haar werkgebied uit in Heerhugowaard voor een gezellige en leerzame bijeenkomst. Dat werd enorm gewaardeerd. Veel Stille Rapers willen contact houden met collega Rapers. Pieter Bijl heeft het plan ingediend (en uitgewerkt) om Stille Rapers middels een website en email met elkaar in contact te brengen en ervaringen uit te wisselen. Er zijn ook plannen om jaarlijks een excursie te organiseren voor alle stille rapers in Noord-Holland boven het Noordzeekanaal.</p>
+				<p>Op 13 oktober 2017 nodigde het Hoogheemraadschap Hollands Noorderkwartier (HHNK) alle Stille Rapers in haar werkgebied uit in Heerhugowaard voor een gezellige en leerzame bijeenkomst. Dat werd enorm gewaardeerd. Veel Stille Rapers willen contact houden met collega Rapers. Pieter Bijl heeft het plan ingediend (en uitgewerkt) om Stille Rapers middels een website en email met elkaar in contact te brengen en ervaringen uit te wisselen. Er zijn ook plannen om jaarlijks een excursie te organiseren voor alle stille rapers in Noord-Holland boven het Noordzeekanaal.</p>
 
 				<h3>Doel</h3>
 				<p>Ons doel is elkaar en anderen te stimuleren om regelmatig zwerfvuil te ruimen, opdat het groen en het water schoon blijft. We willen ervaringen uitwisselen en laten zien waar we actief zijn. De excursies zijn onze beloning.</p>
