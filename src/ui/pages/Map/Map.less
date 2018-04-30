@@ -41,11 +41,15 @@
 
 		#googleMap {
 			margin: 20px auto;
-			padding-bottom: 50%;
+			padding-bottom: 120%;
 			position: relative;
 			width: 100%;
 			z-index: 1;
-		}	
+
+			@media @landscape {
+				padding-bottom: 50%;
+			}
+		}
 	}
 
 	.buttonHolder {

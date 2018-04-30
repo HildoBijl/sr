@@ -380,7 +380,7 @@ class Map extends Component {
 		const geometry = feature.getGeometry()
 		const aid = feature.getId()
 		const uid = feature.getProperty('uid')
-		const isHoveringOn = (this.props.map.hover && aid === this.props.map.hover.aid)
+		const isHoveringOn = (this.props.map.hover && (this.props.map.page === 'fullMap' ? uid === this.props.map.hover.uid : aid === this.props.map.hover.aid))
 		const isActive = this.props.map.page === 'ownAreas' && this.props.map.activeArea === aid
 		const numSides = geometry.getLength() > 0 ? geometry.getAt(0).getLength() : 0
 		const isCurrentUser = (uid === this.props.user.uid)

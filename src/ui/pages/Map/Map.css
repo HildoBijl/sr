@@ -54,10 +54,15 @@
 }
 .map .mapContainer #googleMap {
   margin: 20px auto;
-  padding-bottom: 50%;
+  padding-bottom: 120%;
   position: relative;
   width: 100%;
   z-index: 1;
+}
+@media (min-width: 480.01px) {
+  .map .mapContainer #googleMap {
+    padding-bottom: 50%;
+  }
 }
 .map .buttonHolder {
   margin-bottom: 4px;
