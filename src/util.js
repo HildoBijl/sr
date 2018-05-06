@@ -8,6 +8,10 @@ export function getMailLink() {
 }
 
 export function stringCompare(A, B) {
+	if (!A)
+		return 1
+	if (!B)
+		return -1
 	const a = A.toLowerCase(), b = B.toLowerCase()
 	if (a < b)
 		return -1
