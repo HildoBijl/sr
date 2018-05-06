@@ -18,7 +18,7 @@ class NewsOverview extends Component {
 
 		// Load the news, if necessary.
 		if (!this.state.newsLoaded) {
-			firebase.database().ref(`public/${this.getType()}`).orderByChild('date').limitToLast(this.getMaxItems()).once('value').then((snapshot) => {
+			firebase.database().ref(`public/${this.getType()}`).orderByChild('title').limitToLast(this.getMaxItems()).once('value').then((snapshot) => {
 				// Read the news and turn it into an array.
 				const news = snapshot.val()
 				this.news = []
@@ -26,7 +26,7 @@ class NewsOverview extends Component {
 					news[id].id = id // Remember the ID.
 					this.news.push(news[id])
 				}
-				this.news.reverse() // Reverse, so we have the last first.
+				this.news.sort((a,b) => b.date - a.date) // Sort by the date.
 
 				// If the component is still mounted, show the changes.
 				if (this.mounted)
