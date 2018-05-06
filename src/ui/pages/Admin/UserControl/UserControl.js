@@ -22,29 +22,37 @@ class UserControl extends Component {
 	componentDidMount() {
 		this.mounted = true // We note that the object is mounted. This is so we can check if SetState is allowed.
 		this.props.loadUserData()
+		this.loadIndividualUserData()
 	}
 	componentWillUnmount() {
 		this.mounted = false
 	}
 
 	componentDidUpdate() {
-		if (this.props.userData.known && !this.users) {
-			this.users = {}
-			Object.keys(this.props.userData.users).forEach(uid => {
-				this.users[uid] = {
-					...this.props.userData.users[uid],
-					loading: true,
-				}
-				firebase.database().ref(`private/users/${uid}`).once('value').then((snapshot) => {
-					this.users[uid] = snapshot.val()
-					this.users[uid].uid = uid
-					if (this.mounted)
-						this.setState({	usersLoaded: this.state.usersLoaded + 1 }) // Needed for a rerender.
-				})
-			})
+		this.loadIndividualUserData()
+	}
 
-			this.setState({ usersLoaded: 0 }) // Needed for a rerender.
-		}
+	loadIndividualUserData() {
+		// Don't do anything when we don't have any general user data, or when we already loaded individual user data.
+		if (!this.props.userData.known || this.users)
+			return
+		
+		// Walk through the users and load them one by one.
+		this.users = {}
+		Object.keys(this.props.userData.users).forEach(uid => {
+			this.users[uid] = {
+				...this.props.userData.users[uid],
+				loading: true,
+			}
+			firebase.database().ref(`private/users/${uid}`).once('value').then((snapshot) => {
+				this.users[uid] = snapshot.val()
+				this.users[uid].uid = uid
+				if (this.mounted)
+					this.setState({	usersLoaded: this.state.usersLoaded + 1 }) // Needed for a rerender.
+			})
+		})
+
+		this.setState({ usersLoaded: 0 }) // Needed for a rerender.
 	}
 
 	promoteUser(user) {
