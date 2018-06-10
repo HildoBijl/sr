@@ -14,8 +14,8 @@ import mapActions from '../../../redux/map.js'
 import { colorToHex, hexToColor, getRandomColor } from '../../../ui/colors.js'
 
 const defaultLocation = { // This location is chosen to be right in the middle of our area. So if we focus the map on that and choose an appropriate scale, we should have the full area on-screen.
-	lat: 52.7437793,
-	lng: 4.8326161,
+	lat: 52.72,
+	lng: 4.9,
 }
 const zoomWithoutPosition = 9 // The zoom we apply when we don't know where the user is and use the default.
 const zoomOnPosition = 13 // The zoom we apply when we know where the user is.
@@ -50,21 +50,22 @@ class Map extends Component {
 		this.props.loadUserData()
 
 		// On loading, ask for the location. If it's given, we center the map on that point and zoom in.
-		if (navigator.geolocation) {
-			const options = {
-				enableHighAccuracy: false, // Do we need a very accurate estimate? (Accuracy within a few meters, instead of a hundred meters.)
-				timeout: 5 * 1000, // After how much time (milliseconds) should we give up and call the fail method?
-				maximumAge: 60 * 60 * 1000, // If an earlier position is known, should we return it? If yes, how old (milliseconds) can that position maximally be?
-			}
-			navigator.geolocation.getCurrentPosition((position) => {
-				this.setState({
-					location: {
-						lat: position.coords.latitude,
-						lng: position.coords.longitude,
-					},
-				})
-			}, undefined, options)
-		}
+		// Note: this part is cancelled out, as the feature didn't improve the experience. For most users, there isn't anything going on in their region, so showing their location didn't help improve the sense of activity.
+		// if (navigator.geolocation) {
+		// 	const options = {
+		// 		enableHighAccuracy: false, // Do we need a very accurate estimate? (Accuracy within a few meters, instead of a hundred meters.)
+		// 		timeout: 5 * 1000, // After how much time (milliseconds) should we give up and call the fail method?
+		// 		maximumAge: 60 * 60 * 1000, // If an earlier position is known, should we return it? If yes, how old (milliseconds) can that position maximally be?
+		// 	}
+		// 	navigator.geolocation.getCurrentPosition((position) => {
+		// 		this.setState({
+		// 			location: {
+		// 				lat: position.coords.latitude,
+		// 				lng: position.coords.longitude,
+		// 			},
+		// 		})
+		// 	}, undefined, options)
+		// }
 
 		// Load Google Maps API if not loaded already.
 		if (!window.google || !window.google.maps) {
