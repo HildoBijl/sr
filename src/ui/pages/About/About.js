@@ -41,6 +41,7 @@ class About extends Component {
 				<h3>Andere zwerfvuil opruim initiatieven</h3>
 				<p>Er zijn verschillende andere partijen die, net als de Stille Rapers, in actie komen tegen zwerfvuil.</p>
 				<ul>
+					<li><a href="https://www.lovenotwaste.com/" target="_blank" rel="noopener noreferrer">Love Not Waste</a> organiseert clean-ups en recycleprojecten voor kinderen en bedrijven.</li>
 					<li>De <a href="https://statiegeldalliantie.org/" target="_blank" rel="noopener noreferrer">Statiegeld Alliantie</a> streeft naar de uitbreiding van het statiegeldsysteem naar blikjes en alle (grote en kleine) PET-flessen. Het doel is om zwerfvuil hiermee tegen te gaan. Daar staan wij natuurlijk volledig achter!</li>
 					<li>De Zaanse Schonen is een groep wandelaars (vooral omgeving Krommenie) die zich elke week verzamelt om hun omgeving schoon te houden. Je kunt ze vinden via hun <a href="https://www.facebook.com/ZaanseSchonen/" target="_blank" rel="noopener noreferrer">Facebook pagina</a>.</li>
 					<li>Ook in de Beemster kun je als groep wandelen en tegelijkertijd zwerfvuil opruimen. Voor meer informatie kun je mailen naar <a href="mailto: beemsterwandelingen@gmail.com" rel="noopener noreferrer">beemsterwandelingen@gmail.com</a>.</li>
